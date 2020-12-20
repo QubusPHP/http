@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         verbose="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false">
+    <testsuites>
+        <testsuite name="Http Test Suite">
+            <directory>Tests/Cookies</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src/</directory>
+            <directory suffix=".php">vendor/</directory>
+            <directory suffix=".php">Cookies/</directory>
+            <directory suffix=".php">Exception/</directory>
+            <directory suffix=".php">Factories/</directory>
+            <directory suffix=".php">Input/</directory>
+            <directory suffix=".php">Interfaces/</directory>
+            <directory suffix=".php">Session/</directory>
+        </whitelist>
+    </filter>
+</phpunit>

@@ -1,0 +1,4 @@
+/config/
+/vendor/
+.phpcs-cache
+index.php
