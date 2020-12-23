@@ -16,7 +16,7 @@ namespace Qubus\Http;
 
 use Laminas\Diactoros\Request as BaseRequest;
 use Psr\Http\Message\RequestInterface;
-use Qubus\Http\Exceptions\MalformedUrlException;
+use Qubus\Http\Exception\MalformedUrlException;
 use Qubus\Http\Input\Handler;
 
 use function array_key_exists;

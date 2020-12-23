@@ -17,7 +17,7 @@ namespace Qubus\Http;
 use JsonSerializable;
 use Laminas\Diactoros\Uri;
 use Psr\Http\Message\UriInterface;
-use Qubus\Http\Exceptions\MalformedUrlException;
+use Qubus\Http\Exception\MalformedUrlException;
 
 use function array_diff_key;
 use function array_filter;

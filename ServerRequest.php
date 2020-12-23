@@ -14,8 +14,9 @@ declare(strict_types=1);
 
 namespace Qubus\Http;
 
-use PHPUnit\Framework\TestCase;
+use Laminas\Diactoros\ServerRequestFactory;
+use Psr\Http\Message\ServerRequestFactoryInterface;
 
-class UriTest extends TestCase
+class ServerRequest extends ServerRequestFactory implements ServerRequestFactoryInterface
 {
 }
