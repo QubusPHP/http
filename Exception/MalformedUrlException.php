@@ -10,7 +10,7 @@
  * @since      1.0.0
  */
 
-namespace Qubus\Http\Exceptions;
+namespace Qubus\Http\Exception;
 
 use Qubus\Exception\Exception;
 
