@@ -17,13 +17,12 @@ namespace Qubus\Http;
 use Laminas\Diactoros\Response as BaseResponse;
 use Psr\Http\Message\ResponseInterface;
 
-use function gmdate;
-use function http_response_code;
-use function sprintf;
-use function strtotime;
-
 class Response extends BaseResponse implements ResponseInterface
 {
+    /**
+     * @param string|resource|StreamInterface $body
+     * @param array $headers
+     */
     public function __construct($body = 'php://memory', int $status = 200, array $headers = [])
     {
         parent::__construct($body, $status, $headers);
