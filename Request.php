@@ -387,7 +387,7 @@ class Request extends BaseRequest implements RequestInterface
     {
         $this->url = $url;
         if ($this->url->getHost() === null) {
-            $this->url->setHost((string) $this->getHost());
+            $this->url->withHost((string) $this->getHost());
         }
     }
 
@@ -511,7 +511,7 @@ class Request extends BaseRequest implements RequestInterface
         if (
             (array_key_exists('HTTPS', $this->getServerArray()) &&
             (! empty($this->getServer('https')) && $this->getServer('https') !== 'off')) ||
-            $this->getServer('server-port') === 443
+            $this->getServer('server-port') === '443'
         ) {
             return true;
         }
