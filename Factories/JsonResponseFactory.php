@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Qubus\Http\Factories;
 
 use Laminas\Diactoros\Response\JsonResponse;
+use Psr\Http\Message\ResponseInterface;
 
 class JsonResponseFactory
 {
@@ -32,7 +33,7 @@ class JsonResponseFactory
         int $status = 200,
         array $headers = [],
         int $encodingOptions = 79
-    ) {
+    ): ResponseInterface {
         return new JsonResponse($data, $status, $headers, $encodingOptions);
     }
 }

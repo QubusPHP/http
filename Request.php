@@ -83,7 +83,7 @@ class Request extends BaseRequest implements RequestInterface
      * @param null|string $method HTTP method for the request, if any.
      * @param string|resource|StreamInterface $body Message body, if any.
      * @param array $headers Headers for the message, if any.
-     * @throws MalformedUrlException|InvalidArgumentException for any invalid value.
+     * @throws MalformedUrlException|InvalidArgumentException For any invalid value.
      */
 
     public function __construct($uri = null, ?string $method = null, $body = 'php://temp', array $headers = [])

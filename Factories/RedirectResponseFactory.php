@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Qubus\Http\Factories;
 
 use Laminas\Diactoros\Response\RedirectResponse;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
 class RedirectResponseFactory
@@ -31,8 +32,11 @@ class RedirectResponseFactory
      * @param int $status Integer status code for the redirect; 302 by default.
      * @param array $headers Array of headers to use at initialization.
      */
-    public static function create(string|StreamInterface $uri, int $status = 302, array $headers = [])
-    {
+    public static function create(
+        string|StreamInterface $uri,
+        int $status = 302,
+        array $headers = []
+    ): ResponseInterface {
         return new RedirectResponse($uri, $status, $headers);
     }
 }

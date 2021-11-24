@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Qubus\Http\Factories;
 
 use Laminas\Diactoros\Response\XmlResponse;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
 class XmlResponseFactory
@@ -30,8 +31,11 @@ class XmlResponseFactory
      * @param array $headers Array of headers to use at initialization.
      * @throws Exception\InvalidArgumentException If $text is neither a string or stream.
      */
-    public static function create(string|StreamInterface $xml, int $status = 200, array $headers = [])
-    {
+    public static function create(
+        string|StreamInterface $xml,
+        int $status = 200,
+        array $headers = []
+    ): ResponseInterface {
         return new XmlResponse($xml, $status, $headers);
     }
 }
