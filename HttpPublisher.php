@@ -66,7 +66,7 @@ class HttpPublisher implements Publisher
                 }
             }
         }
-        return (new HtmlResponseFactory())->create(
+        return HtmlResponseFactory::create(
             'The response body must be an instance of ResponseInterface or StreamInterface',
             200,
             ['Content-Type' => ['application/xhtml+xml']]
