@@ -27,17 +27,8 @@ interface Session
      * Retrieve session.
      *
      * @param string $name Session name.
-     * @return mixed
      */
-    public function get(string $name);
-
-    /**
-     * Sets the session.
-     *
-     * @param string $name Session name.
-     * @param mixed  $value Value of the session set.
-     */
-    public function set(string $name, $value): void;
+    public function get(string $name): string|array;
 
     /**
      * Returns all session data.
@@ -45,4 +36,9 @@ interface Session
      * @return array
      */
     public function getAll(): array;
+
+    /**
+     * Destroy specific session data by key.
+     */
+    public function unsetSession(string $key): void;
 }

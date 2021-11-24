@@ -78,7 +78,7 @@ class NativeSession implements Session
      * @param string $name Session name.
      * @return string
      */
-    public function get(string $name)
+    public function get(string $name): string|array
     {
         $this->startSession();
 
@@ -220,7 +220,8 @@ class NativeSession implements Session
 
     public function clear(): void
     {
-        $this->open();
+        $this->startSession();
+
         $_SESSION = [];
     }
 
