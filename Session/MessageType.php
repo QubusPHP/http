@@ -17,10 +17,10 @@ namespace Qubus\Http\Session;
 class MessageType
 {
     // Message types and shortcuts
-    const INFO = 'i';
-    const SUCCESS = 's';
-    const WARNING = 'w';
-    const ERROR = 'e';
+    public const INFO = 'i';
+    public const SUCCESS = 's';
+    public const WARNING = 'w';
+    public const ERROR = 'e';
     // Default message type
-    const DEFAULT = self::INFO;
+    public const DEFAULT = self::INFO;
 }
