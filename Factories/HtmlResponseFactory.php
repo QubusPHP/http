@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Qubus\Http\Factories;
 
 use Laminas\Diactoros\Response\HtmlResponse;
+use Psr\Http\Message\StreamInterface;
 
 class HtmlResponseFactory
 {
@@ -29,7 +30,7 @@ class HtmlResponseFactory
      * @param array $headers Array of headers to use at initialization.
      * @throws Exception\InvalidArgumentException If $html is neither a string or stream.
      */
-    public static function create($html, int $status = 200, array $headers = [])
+    public static function create(string|StreamInterface $html, int $status = 200, array $headers = [])
     {
         return new HtmlResponse($html, $status, $headers);
     }
