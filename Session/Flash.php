@@ -23,15 +23,13 @@ use function array_keys;
 use function is_array;
 use function sha1;
 use function sprintf;
-use function strlen;
 use function strtolower;
-use function trim;
 use function uniqid;
 
 class Flash
 {
     use FlashAware;
-    
+
     /** @var array $msgTypes */
     protected array $msgTypes = [
         MessageType::ERROR   => 'error',

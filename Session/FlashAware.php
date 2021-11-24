@@ -14,6 +14,11 @@ declare(strict_types=1);
 
 namespace Qubus\Http\Session;
 
+use function array_key_exists;
+use function strlen;
+use function strtolower;
+use function trim;
+
 trait FlashAware
 {
     /**
