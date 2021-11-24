@@ -25,6 +25,7 @@
         "phpspec/prophecy-phpunit": "^2.0",
         "psr/http-message": "^1.0",
         "qubus/config": "^1.1",
+        "qubus/exception": "^1.2",
         "qubus/valueobjects": "^1.4"
     },
     "require-dev": {
