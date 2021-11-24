@@ -20,7 +20,7 @@ use Defuse\Crypto\Key;
 
 class DefuseEncryptionTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (! class_exists('Defuse\Crypto\Crypto')) {
             $this->markTestSkipped('Missing defuse/php-encryption');

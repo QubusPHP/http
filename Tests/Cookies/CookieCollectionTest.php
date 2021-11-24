@@ -16,6 +16,7 @@ namespace Qubus\Tests\Http\Cookies;
 
 use PHPUnit\Framework\TestCase;
 use Qubus\Http\Cookies\CookieCollection;
+use PHPUnit\Framework\Assert;
 
 class CookieCollectionTest extends TestCase
 {
@@ -30,7 +31,7 @@ class CookieCollectionTest extends TestCase
     ) : void {
         $cookie = CookieCollection::oneFromCookiePair($cookieString);
 
-        self::assertCookieNameAndValue($cookie, $expectedName, $expectedValue);
+        $this->assertCookieNameAndValue($cookie, $expectedName, $expectedValue);
     }
 
     /**
@@ -43,20 +44,23 @@ class CookieCollectionTest extends TestCase
     {
         $cookies = CookieCollection::listFromCookieString($cookieString);
 
-        self::assertCount(count($expectedNameValuePairs), $cookies);
+        Assert::assertCount(count($expectedNameValuePairs), $cookies);
 
         for ($i = 0; $i < count($cookies); $i++) {
             $cookie                              = $cookies[$i];
             list($expectedName, $expectedValue) = $expectedNameValuePairs[$i];
 
-            self::assertCookieNameAndValue($cookie, $expectedName, $expectedValue);
+            $this->assertCookieNameAndValue($cookie, $expectedName, $expectedValue);
         }
     }
 
-    private function assertCookieNameAndValue(CookieCollection $cookie, string $expectedName, ?string $expectedValue): void
-    {
-        self::assertEquals($expectedName, $cookie->getName());
-        self::assertEquals($expectedValue, $cookie->getValue());
+    private function assertCookieNameAndValue(
+        CookieCollection $cookie,
+        string $expectedName,
+        ?string $expectedValue
+    ): void {
+        Assert::assertEquals($expectedName, $cookie->getName());
+        Assert::assertEquals($expectedValue, $cookie->getValue());
     }
 
     /** @return string[][] */

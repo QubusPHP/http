@@ -69,6 +69,8 @@ final class SameSiteTest extends TestCase
      */
     public function testCanBeBuiltFromaString(): void
     {
+        $this->expectException(TypeException::class);
+
         self::assertEquals(SameSite::strict(), SameSite::fromString('Strict'));
         self::assertEquals(SameSite::strict(), SameSite::fromString('strict'));
         self::assertEquals(SameSite::strict(), SameSite::fromString('stRiCt'));

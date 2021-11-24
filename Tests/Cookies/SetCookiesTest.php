@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Qubus\Tests\Http\Cookies;
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Http\Message\ResponseInterface;
 use Qubus\Http\Cookies\SetCookies;
@@ -23,6 +24,8 @@ use Qubus\Http\Cookies\SetCookieCollection;
 
 class SetCookiesTest extends TestCase
 {
+    use ProphecyTrait;
+    
     public const INTERFACE_PSR_HTTP_MESSAGE_RESPONSE = ResponseInterface::class;
 
     /**
