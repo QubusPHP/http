@@ -12,6 +12,7 @@
     <testsuites>
     <testsuite name="Http Test Suite">
       <directory>Tests/Cookies</directory>
+      <directory>Tests/Session</directory>
     </testsuite>
   </testsuites>
 </phpunit>
