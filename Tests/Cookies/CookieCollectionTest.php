@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Beau Simensen <beau@dflydev.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -14,9 +15,11 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Http\Cookies;
 
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Qubus\Http\Cookies\CookieCollection;
-use PHPUnit\Framework\Assert;
+
+use function count;
 
 class CookieCollectionTest extends TestCase
 {
@@ -28,7 +31,7 @@ class CookieCollectionTest extends TestCase
         string $cookieString,
         string $expectedName,
         ?string $expectedValue
-    ) : void {
+    ): void {
         $cookie = CookieCollection::oneFromCookiePair($cookieString);
 
         $this->assertCookieNameAndValue($cookie, $expectedName, $expectedValue);
@@ -36,7 +39,6 @@ class CookieCollectionTest extends TestCase
 
     /**
      * @param string[] $expectedNameValuePairs
-     *
      * @test
      * @dataProvider provideParsesListFromCookieString
      */
@@ -48,7 +50,7 @@ class CookieCollectionTest extends TestCase
 
         for ($i = 0; $i < count($cookies); $i++) {
             $cookie                              = $cookies[$i];
-            list($expectedName, $expectedValue) = $expectedNameValuePairs[$i];
+            [$expectedName, $expectedValue] = $expectedNameValuePairs[$i];
 
             $this->assertCookieNameAndValue($cookie, $expectedName, $expectedValue);
         }
@@ -84,7 +86,6 @@ class CookieCollectionTest extends TestCase
                     ['sessionToken', 'abc123'],
                 ],
             ],
-
             [
                 'theme=light; sessionToken=abc123;',
                 [

@@ -4,7 +4,10 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2022 Joshua Parker
+ * @copyright  2022 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2016 Thomas Nordahl Pedersen <thno@jfmedier.dk>
+ * @copyright  2016 Rasmus Schultz (aka mindplay-dk) <rasc@jfmedier.dk>
+ * @copyright  2016 Bo Andersen <boan@jfmedier.dk>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      2.0.0
@@ -33,7 +36,8 @@ use Qubus\Http\Session\Storage\SimpleCacheStorage;
 use Qubus\Tests\Http\Session\Entity\UserSession;
 use Qubus\Tests\Http\Session\Mock\DelegateMock;
 
-use function PHPUnit\Framework\assertNotEmpty;
+use function mb_strpos;
+use function mb_substr;
 
 class SessionMiddlewareTest extends TestCase
 {
@@ -50,7 +54,7 @@ class SessionMiddlewareTest extends TestCase
 
         $localAdapter = new LocalFlysystemAdapter($config);
         $filesystem = new FileSystem($localAdapter);
-        
+
         $this->storage = new SimpleCacheStorage(new FileSystemCache($filesystem, 160));
         $this->cookie = new CookieFactory($config);
         $this->middleware = (new SessionMiddleware($this->cookie, $this->storage))
@@ -60,8 +64,8 @@ class SessionMiddlewareTest extends TestCase
     public function testGenerateSessionEntity()
     {
         $userEntity = null;
-        
-        $delegate = new DelegateMock(function(ServerRequestInterface $request) use(&$userEntity) {
+
+        $delegate = new DelegateMock(function (ServerRequestInterface $request) use (&$userEntity) {
             $session = $request->getAttribute('phpunit');
 
             Assert::assertInstanceOf(

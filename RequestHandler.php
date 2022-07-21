@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2022 Joshua Parker
+ * @copyright  2022 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      2.0.0
@@ -17,12 +17,14 @@ namespace Qubus\Http;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+
+use function array_shift;
 
 final class RequestHandler implements RequestHandlerInterface
 {
-    final public const RESPONSE_CODE = 200;
+    public const RESPONSE_CODE = 200;
 
     public function __construct(
         /** @var ResponseFactoryInterface */
@@ -37,11 +39,10 @@ final class RequestHandler implements RequestHandlerInterface
         $middleware = $this->middlewares[0] ?? false;
         array_shift($this->middlewares);
 
-        return 
-            $middleware ? 
-            $middleware->process(
-                $serverRequest,
-                new self($this->responseFactory, $this->middlewares)
-            ) : $this->responseFactory->createResponse(self::RESPONSE_CODE);
+        return $middleware ?
+        $middleware->process(
+            $serverRequest,
+            new self($this->responseFactory, $this->middlewares)
+        ) : $this->responseFactory->createResponse(self::RESPONSE_CODE);
     }
 }

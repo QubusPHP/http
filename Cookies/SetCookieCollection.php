@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Beau Simensen <beau@dflydev.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -187,9 +188,6 @@ final class SetCookieCollection
         return $this->withExpires(new DateTime('+5 years'));
     }
 
-    /**
-     * Undocumented function
-     */
     public function expire(): self
     {
         return $this->withExpires(new DateTime('-5 years'));
@@ -243,9 +241,6 @@ final class SetCookieCollection
         return $clone;
     }
 
-    /**
-     * Undocumented function
-     */
     public function withHttpOnly(bool $httpOnly = true): self
     {
         $clone = clone $this;
@@ -255,9 +250,6 @@ final class SetCookieCollection
         return $clone;
     }
 
-    /**
-     * Undocumented function
-     */
     public function withSameSite(SameSite $sameSite): self
     {
         $clone = clone $this;
@@ -267,9 +259,6 @@ final class SetCookieCollection
         return $clone;
     }
 
-    /**
-     * Undocumented function
-     */
     public function withoutSameSite(): self
     {
         $clone = clone $this;
@@ -279,9 +268,6 @@ final class SetCookieCollection
         return $clone;
     }
 
-    /**
-     * Undocumented function
-     */
     public function __toString(): string
     {
         $cookieStringParts = [
@@ -299,33 +285,21 @@ final class SetCookieCollection
         return implode('; ', $cookieStringParts);
     }
 
-    /**
-     * Undocumented function
-     */
     public static function create(string $name, ?string $value = null): self
     {
         return new static($name, $value);
     }
 
-    /**
-     * Undocumented function
-     */
     public static function createRememberedForever(string $name, ?string $value = null): self
     {
         return static::create($name, $value)->rememberForever();
     }
 
-    /**
-     * Undocumented function
-     */
     public static function createExpired(string $name): self
     {
         return static::create($name)->expire();
     }
 
-    /**
-     * Undocumented function
-     */
     public static function fromSetCookieString(string $string): self
     {
         $rawAttributes = Util::splitOnAttributeDelimiter($string);

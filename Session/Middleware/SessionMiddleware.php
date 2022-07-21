@@ -4,8 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2022 Joshua Parker
- * @copyright  2017 Flarum Framework
+ * @copyright  2022 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      2.0.0
@@ -32,6 +31,10 @@ use Qubus\Http\Session\SessionId;
 use Qubus\Http\Session\Storage\SessionStorage;
 use Qubus\Http\Session\Validatable;
 
+use function count;
+use function is_array;
+use function preg_match;
+
 final class SessionMiddleware implements MiddlewareInterface
 {
     private const SESSION_ATTRIBUTE = 'session';
@@ -46,13 +49,14 @@ final class SessionMiddleware implements MiddlewareInterface
 
     /**
      * Set the session options.
-     * 
+     *
      * Example:
      *         [
      *            name => 'session name',
      *            attribute => 'session attribute', //usually 'session'
      *            lifetime => '300', //cookie lifetime in seconds
      *         ]
+     *
      * @param array $options
      * @return SessionMiddleware
      */
@@ -65,10 +69,10 @@ final class SessionMiddleware implements MiddlewareInterface
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws Exception 
-     * @throws TypeException 
-     * @throws InvalidArgumentException 
+     *
+     * @throws Exception
+     * @throws TypeException
+     * @throws InvalidArgumentException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -84,11 +88,9 @@ final class SessionMiddleware implements MiddlewareInterface
 
     /**
      * Create a Session for the given Request.
-     * 
-     * @param ServerRequestInterface $request 
-     * @return HttpSession 
-     * @throws GlobalException 
-     * @throws TypeException 
+     *
+     * @throws GlobalException
+     * @throws TypeException
      */
     private function makeSession(ServerRequestInterface $request): HttpSession
     {
@@ -100,7 +102,7 @@ final class SessionMiddleware implements MiddlewareInterface
             $pattern = '/' . Validatable::VALID_PATTERN . '/';
 
             if (preg_match($pattern, $clientSessionId)) {
-                $sessionId = SessionID::create($clientSessionId);
+                $sessionId = SessionId::create($clientSessionId);
 
                 $data = $this->storage->read($sessionId);
 
@@ -114,13 +116,10 @@ final class SessionMiddleware implements MiddlewareInterface
 
     /**
      * Commit Session to storage and add the Session Cookie to the given Response.
-     * 
-     * @param ResponseInterface $response 
-     * @param HttpSession $session 
-     * @return ResponseInterface 
-     * @throws TypeException 
-     * @throws Exception 
-     * @throws InvalidArgumentException 
+     *
+     * @throws TypeException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     private function commitSession(ResponseInterface $response, HttpSession $session): ResponseInterface
     {
@@ -152,7 +151,8 @@ final class SessionMiddleware implements MiddlewareInterface
                     $response,
                     $this->cookie->make(
                         $this->options['name'] ?? $session::COOKIE_NAME,
-                        $session->clientSessionId(), $this->getSessionLifetimeInSeconds()
+                        $session->clientSessionId(),
+                        $this->getSessionLifetimeInSeconds()
                     )
                 );
             }

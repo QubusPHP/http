@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2022 Joshua Parker
+ * @copyright  2022 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      2.0.0
@@ -20,12 +20,10 @@ use Qubus\Http\Cookies\SameSite;
 use Qubus\Http\Cookies\SetCookieCollection;
 
 use function Qubus\Support\Helpers\is_null__;
+use function time;
 
 class CookieFactory
 {
-    /**
-     * @param ConfigContainer $config
-     */
     public function __construct(protected ConfigContainer $config)
     {
     }
@@ -34,11 +32,6 @@ class CookieFactory
      * Make a new cookie instance.
      *
      * This method returns a cookie instance for use with the Set-Cookie HTTP header.
-     *
-     * @param  string   $name
-     * @param  string   $value
-     * @param  int|null $maxAge
-     * @return SetCookieCollection
      */
     public function make(string $name, ?string $value = null, ?int $maxAge = null): SetCookieCollection
     {
@@ -52,7 +45,7 @@ class CookieFactory
                 ->withExpires(time() + $maxAge);
         }
 
-        if (!is_null__($this->domain())) {
+        if (! is_null__($this->domain())) {
             $cookie = $cookie->withDomain($this->domain());
         }
 
@@ -67,9 +60,6 @@ class CookieFactory
 
     /**
      * Make an expired cookie instance.
-     *
-     * @param string $name
-     * @return SetCookieCollection
      */
     public function expire(string $name): SetCookieCollection
     {
@@ -78,9 +68,8 @@ class CookieFactory
 
     /**
      * The cookie path. Default: '/'.
-     * 
-     * @return string|null 
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public function path(): string|null
     {
@@ -89,9 +78,8 @@ class CookieFactory
 
     /**
      * The cookie domain.
-     * 
-     * @return string 
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public function domain(): string
     {
@@ -99,9 +87,7 @@ class CookieFactory
     }
 
     /**
-     * 
-     * @return bool 
-     * @throws Exception 
+     * @throws Exception
      */
     public function secure(): bool
     {
@@ -110,9 +96,8 @@ class CookieFactory
 
     /**
      * Cookie samesite. Default: 'lax'.
-     * 
-     * @return string 
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public function samesite(): string
     {

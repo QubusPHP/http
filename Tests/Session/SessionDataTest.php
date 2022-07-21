@@ -4,7 +4,10 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2022 Joshua Parker
+ * @copyright  2022 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2016 Thomas Nordahl Pedersen <thno@jfmedier.dk>
+ * @copyright  2016 Rasmus Schultz (aka mindplay-dk) <rasc@jfmedier.dk>
+ * @copyright  2016 Bo Andersen <boan@jfmedier.dk>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      2.0.0

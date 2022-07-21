@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2022 Joshua Parker
+ * @copyright  2022 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      2.0.0
@@ -13,6 +13,15 @@
 declare(strict_types=1);
 
 namespace Qubus\Http\Session;
+
+use function assert;
+use function chr;
+use function ord;
+use function random_bytes;
+use function sha1;
+use function str_split;
+use function strlen;
+use function vsprintf;
 
 class SessionId
 {
@@ -30,5 +39,5 @@ class SessionId
 
         // Output the 36 character UUID.
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(sha1($id), 4));
-    }    
+    }
 }

@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2022 Joshua Parker
+ * @copyright  2022 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      2.0.0
@@ -26,7 +26,7 @@ class ClientSessionId extends Uuid implements Validatable
     {
         $sessionId = (new self($id))->__toString();
 
-        if($sessionId instanceof TypeException) {
+        if ($sessionId instanceof TypeException) {
             throw new TypeException('String is not a valid Uuidv4 id.');
         }
 

@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Beau Simensen <beau@dflydev.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -48,8 +49,6 @@ final class SameSite
     }
 
     /**
-     * Undocumented function
-     *
      * @throws TypeException If the given SameSite string is neither strict, lax or none.
      */
     public static function fromString(string $sameSite): self

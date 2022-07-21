@@ -4,7 +4,10 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2022 Joshua Parker
+ * @copyright  2022 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2016 Thomas Nordahl Pedersen <thno@jfmedier.dk>
+ * @copyright  2016 Rasmus Schultz (aka mindplay-dk) <rasc@jfmedier.dk>
+ * @copyright  2016 Bo Andersen <boan@jfmedier.dk>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      2.0.0
@@ -18,7 +21,10 @@ use Qubus\Exception\Data\TypeException;
 use Qubus\Support\Serializer\JsonSerializer;
 use ReflectionClass;
 
+use function class_exists;
+use function md5_file;
 use function Qubus\Support\Helpers\is_null__;
+use function sprintf;
 
 final class SessionData implements HttpSession
 {
@@ -30,7 +36,7 @@ final class SessionData implements HttpSession
 
     private function __construct(
         /** @var string client session id. */
-        private string $clientSessionId, 
+        private string $clientSessionId,
         private array $data,
         private bool $isNew = false,
     ) {
@@ -65,7 +71,7 @@ final class SessionData implements HttpSession
         $data = $this->data;
 
         foreach ($this->objects as $object) {
-            $type = get_class($object);
+            $type = $object::class;
 
             if ($object->isEmpty()) {
                 unset($data[$type]);
@@ -91,10 +97,10 @@ final class SessionData implements HttpSession
                 [$checksum, $serialized] = $this->data[$type];
 
                 $this->objects[$type] = $checksum === $this->checksum($type)
-                    ? (new JsonSerializer())->unserialize($serialized)
-                    : new $type;
+                ? (new JsonSerializer())->unserialize($serialized)
+                : new $type();
             } else {
-                $this->objects[$type] = new $type;
+                $this->objects[$type] = new $type();
             }
         }
 
@@ -133,7 +139,7 @@ final class SessionData implements HttpSession
 
     public function isRenewed(): bool
     {
-        return !is_null__($this->oldSessionId);
+        return ! is_null__($this->oldSessionId);
     }
 
     public function oldSessionID(): ?string
@@ -156,7 +162,7 @@ final class SessionData implements HttpSession
     {
         static $checksum = [];
 
-        if (!isset($checksum[$type])) {
+        if (! isset($checksum[$type])) {
             $reflection = new ReflectionClass($type);
 
             $checksum[$type] = md5_file($reflection->getFileName());

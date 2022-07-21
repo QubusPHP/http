@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Beau Simensen <beau@dflydev.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -14,11 +15,13 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Http\Cookies;
 
-use Qubus\Tests\Http\Cookies\CookieRequestTesting;
-use Qubus\Http\Cookies\CookiesRequest;
 use PHPUnit\Framework\TestCase;
-use Qubus\Http\Cookies\Cookies;
 use Qubus\Http\Cookies\CookieCollection;
+use Qubus\Http\Cookies\Cookies;
+use Qubus\Http\Cookies\CookiesRequest;
+use Qubus\Tests\Http\Cookies\CookieRequestTesting;
+
+use function strtoupper;
 
 class CookiesRequestTest extends TestCase
 {
@@ -76,8 +79,7 @@ class CookiesRequestTest extends TestCase
     public function testRemovesCookies(): void
     {
         $request = (new CookieRequestTesting())
-            ->withHeader(Cookies::COOKIE_HEADER, 'theme=light; sessionToken=RAPELCGRQ; hello=world')
-        ;
+            ->withHeader(Cookies::COOKIE_HEADER, 'theme=light; sessionToken=RAPELCGRQ; hello=world');
 
         $request = CookiesRequest::remove($request, 'sessionToken');
 

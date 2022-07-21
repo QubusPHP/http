@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2022 Joshua Parker
+ * @copyright  2022 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      2.0.0
@@ -18,7 +18,6 @@ use Qubus\Http\Session\SessionEntity;
 
 class UserSession implements SessionEntity
 {
-
     public function __construct(protected ?string $userId = null)
     {
     }
@@ -37,5 +36,4 @@ class UserSession implements SessionEntity
     {
         return empty($this->userId);
     }
-    
 }

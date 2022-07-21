@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -65,7 +65,6 @@ class Flash
 
     protected ?string $redirectUrl = null;
 
-    /** @var string $msgId */
     public readonly string $msgId;
 
     public function __construct(public readonly PhpSession $session)

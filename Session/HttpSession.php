@@ -4,10 +4,13 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2022 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2016 Thomas Nordahl Pedersen <thno@jfmedier.dk>
+ * @copyright  2016 Rasmus Schultz (aka mindplay-dk) <rasc@jfmedier.dk>
+ * @copyright  2016 Bo Andersen <boan@jfmedier.dk>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
- * @since      1.0.0
+ * @since      2.0.0
  */
 
 declare(strict_types=1);
@@ -17,21 +20,19 @@ namespace Qubus\Http\Session;
 interface HttpSession
 {
     public const COOKIE_NAME = "HTTPSESSID";
-    
+
     /**
      * Retrieve session entity.
      *
      * @param string $type Fully qualified class name.
-     * @param string $name Session name.
-     * @return SessionEntity
      * @throws TypeException Class name given does not exist.
      */
     public function get(string $type): SessionEntity;
 
     /**
      * Returns an array of object data.
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getData(): array;
 
@@ -46,8 +47,6 @@ interface HttpSession
      * (This is not as bad as it may sound, as very likely the only practical use-case for
      * `clear()` is a logout controller/action, during which likely no other session models
      * would be used or manipulated.)
-     *
-     * @return void
      */
     public function clear(): void;
 
@@ -67,13 +66,13 @@ interface HttpSession
     public function renew();
 
     /**
-     * Returns the session's uuid which is derived 
+     * Returns the session's uuid which is derived
      * from the client session's id.
      */
     public function sessionId(): string;
 
     /**
-     * Client session id which is stored in client's 
+     * Client session id which is stored in client's
      * cookie and never on the server.
      */
     public function clientSessionId(): string;
