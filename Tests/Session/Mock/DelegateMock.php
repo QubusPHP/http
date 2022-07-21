@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * Qubus\Http
+ *
+ * @link       https://github.com/QubusPHP/http
+ * @copyright  2022 Joshua Parker
+ * @license    https://opensource.org/licenses/mit-license.php MIT License
+ *
+ * @since      2.0.0
+ */
+
+declare(strict_types=1);
+
+namespace Qubus\Tests\Http\Session\Mock;
+
+use Closure;
+use Laminas\Diactoros\Response;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+
+class DelegateMock implements RequestHandlerInterface
+{
+    /**
+     * @var Closure
+     */
+    public $next;
+
+    public function __construct(Closure $next)
+    {
+        $this->next = $next;
+    }
+
+    /**
+     * Dispatch the next available middleware and return the response.
+     *
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        $response = call_user_func_array($this->next, [$request]);
+
+        return ($response instanceof ResponseInterface) ? $response : new Response();
+    }
+}
