@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Beau Simensen <beau@dflydev.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -29,7 +30,7 @@ final class SameSiteTest extends TestCase
     {
         $strict = SameSite::strict();
 
-        self::assertInstanceOf('Qubus\Http\Cookies\SameSite', $strict);
+        self::assertInstanceOf(SameSite::class, $strict);
         self::assertSame('SameSite=Strict', $strict->asString());
         self::assertEquals(SameSite::strict(), $strict, 'Multiple instances are equivalent');
     }
@@ -39,7 +40,7 @@ final class SameSiteTest extends TestCase
     {
         $lax = SameSite::lax();
 
-        self::assertInstanceOf('Qubus\Http\Cookies\SameSite', $lax);
+        self::assertInstanceOf(SameSite::class, $lax);
         self::assertSame('SameSite=Lax', $lax->asString());
         self::assertEquals(SameSite::lax(), $lax, 'Multiple instances are equivalent');
     }
@@ -49,7 +50,7 @@ final class SameSiteTest extends TestCase
     {
         $none = SameSite::none();
 
-        self::assertInstanceOf('Qubus\Http\Cookies\SameSite', $none);
+        self::assertInstanceOf(SameSite::class, $none);
         self::assertSame('SameSite=None', $none->asString());
         self::assertEquals(SameSite::none(), $none, 'Multiple instances are equivalent');
     }
@@ -64,11 +65,12 @@ final class SameSiteTest extends TestCase
 
     /**
      * @test
-     *
      * @expectedException \Qubus\Exception\Data\TypeException
      */
     public function testCanBeBuiltFromaString(): void
     {
+        $this->expectException(TypeException::class);
+
         self::assertEquals(SameSite::strict(), SameSite::fromString('Strict'));
         self::assertEquals(SameSite::strict(), SameSite::fromString('strict'));
         self::assertEquals(SameSite::strict(), SameSite::fromString('stRiCt'));

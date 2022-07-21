@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -32,7 +32,7 @@ use function strpos;
 use function strtolower;
 use function strtoupper;
 
-class Request extends BaseRequest implements RequestInterface
+final class Request extends BaseRequest implements RequestInterface
 {
     /**
      * Additional data.
@@ -83,7 +83,7 @@ class Request extends BaseRequest implements RequestInterface
      * @param null|string $method HTTP method for the request, if any.
      * @param string|resource|StreamInterface $body Message body, if any.
      * @param array $headers Headers for the message, if any.
-     * @throws MalformedUrlException|InvalidArgumentException for any invalid value.
+     * @throws MalformedUrlException|InvalidArgumentException For any invalid value.
      */
 
     public function __construct($uri = null, ?string $method = null, $body = 'php://temp', array $headers = [])
@@ -189,7 +189,8 @@ class Request extends BaseRequest implements RequestInterface
      */
     public function getHttpHeader(string $name, ?string $defaultValue = null): ?string
     {
-        return $this->httpHeaders[strtolower($name)] ?? $defaultValue;
+        $name = strtolower(str_replace('_', '-', $name));
+        return $this->httpHeaders[$name] ?? $defaultValue;
     }
 
     /**
@@ -387,7 +388,7 @@ class Request extends BaseRequest implements RequestInterface
     {
         $this->url = $url;
         if ($this->url->getHost() === null) {
-            $this->url->setHost((string) $this->getHost());
+            $this->url->withHost((string) $this->getHost());
         }
     }
 
@@ -511,7 +512,7 @@ class Request extends BaseRequest implements RequestInterface
         if (
             (array_key_exists('HTTPS', $this->getServerArray()) &&
             (! empty($this->getServer('https')) && $this->getServer('https') !== 'off')) ||
-            $this->getServer('server-port') === 443
+            $this->getServer('server-port') === '443'
         ) {
             return true;
         }
@@ -524,20 +525,11 @@ class Request extends BaseRequest implements RequestInterface
      */
     public function isValidHttpMethod(string $method): bool
     {
-        switch (strtoupper($method)) {
-            case 'GET':
-            case 'POST':
-            case 'PUT':
-            case 'DELETE':
-            case 'HEAD':
-            case 'OPTIONS':
-            case 'PATCH':
-            case 'TRACE':
-            case 'CONNECT':
-                return true;
-        }
-
-        return false;
+        return match(strtoupper($method)) {
+            'GET','POST','PUT','DELETE','HEAD','OPTIONS',
+            'PATCH','TRACE','CONNECT' => true,
+            default => false,
+        };
     }
 
     protected function getServerArray(): array

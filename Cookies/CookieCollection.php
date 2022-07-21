@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Beau Simensen <beau@dflydev.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -17,7 +18,7 @@ namespace Qubus\Http\Cookies;
 use function array_map;
 use function urlencode;
 
-class CookieCollection
+final class CookieCollection
 {
     private ?string $name = null;
 
@@ -32,7 +33,7 @@ class CookieCollection
     /**
      * Get cookie name.
      */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }

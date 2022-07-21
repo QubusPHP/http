@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Beau Simensen <beau@dflydev.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -28,11 +29,8 @@ final class SameSite
     private const LAX    = 'Lax';
     private const NONE   = 'None';
 
-    private ?string $value = null;
-
-    private function __construct(string $value)
+    private function __construct(private string $value)
     {
-        $this->value = $value;
     }
 
     public static function strict(): self
@@ -51,8 +49,6 @@ final class SameSite
     }
 
     /**
-     * Undocumented function
-     *
      * @throws TypeException If the given SameSite string is neither strict, lax or none.
      */
     public static function fromString(string $sameSite): self
@@ -73,7 +69,7 @@ final class SameSite
 
         throw new TypeException(
             sprintf(
-                'Expected modifier value to be either "strict", "lax", or "none", "%s" given',
+                'Expected modifier value to be either "strict", "lax", or "none", "%s" given.',
                 $sameSite
             )
         );

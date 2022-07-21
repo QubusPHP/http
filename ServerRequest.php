@@ -4,19 +4,44 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2022 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
- * @since      1.0.0
+ * @since      2.0.0
  */
 
 declare(strict_types=1);
 
 namespace Qubus\Http;
 
-use Laminas\Diactoros\ServerRequestFactory;
-use Psr\Http\Message\ServerRequestFactoryInterface;
+use Laminas\Diactoros\ServerRequest as BaseServerRequest;
+use Psr\Http\Message\ServerRequestInterface;
 
-class ServerRequest extends ServerRequestFactory implements ServerRequestFactoryInterface
+final class ServerRequest extends BaseServerRequest implements ServerRequestInterface
 {
+    public function __construct(
+        array $serverParams = [],
+        array $uploadedFiles = [],
+        $uri = null,
+        ?string $method = null,
+        $body = 'php://input',
+        array $headers = [],
+        array $cookies = [],
+        array $queryParams = [],
+        $parsedBody = null,
+        string $protocol = '1.1'
+    ) {
+        parent::__construct(
+            $serverParams,
+            $uploadedFiles,
+            $uri,
+            $method,
+            $body,
+            $headers,
+            $cookies,
+            $queryParams,
+            $parsedBody,
+            $protocol
+        );
+    }
 }

@@ -4,17 +4,17 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2022 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
- * @since      1.0.0
+ * @since      2.0.0
  */
 
 declare(strict_types=1);
 
 namespace Qubus\Http\Session;
 
-interface Session
+interface PhpSession
 {
     /**
      * Checks if session exists.
@@ -27,17 +27,8 @@ interface Session
      * Retrieve session.
      *
      * @param string $name Session name.
-     * @return mixed
      */
-    public function get(string $name);
-
-    /**
-     * Sets the session.
-     *
-     * @param string $name Session name.
-     * @param mixed  $value Value of the session set.
-     */
-    public function set(string $name, $value): void;
+    public function get(string $name): string|array;
 
     /**
      * Returns all session data.
@@ -45,4 +36,9 @@ interface Session
      * @return array
      */
     public function getAll(): array;
+
+    /**
+     * Destroy specific session data by key.
+     */
+    public function unsetSession(string $key): void;
 }

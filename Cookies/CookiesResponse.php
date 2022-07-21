@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Beau Simensen <beau@dflydev.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -20,11 +21,8 @@ use Qubus\Http\Cookies\SetCookies;
 
 use function is_callable;
 
-class CookiesResponse
+final class CookiesResponse
 {
-    /**
-     * Undocumented function
-     */
     public static function get(ResponseInterface $response, string $name, ?string $value = null): SetCookieCollection
     {
         $setCookies = SetCookies::fromResponse($response);
@@ -38,28 +36,20 @@ class CookiesResponse
     }
 
     /**
-     * Undocumented function
-     *
      * @param CookieCollection $setCookie
      */
-    public static function set(ResponseInterface $response, SetCookieCollection $setCookie): ResponseInterface
+    public static function set(ResponseInterface $response, SetCookieCollection $setCookieCollection): ResponseInterface
     {
         return SetCookies::fromResponse($response)
-            ->with($setCookie)
+            ->with($setCookieCollection)
             ->renderIntoSetCookieHeader($response);
     }
 
-    /**
-     * Undocumented function
-     */
     public static function expire(ResponseInterface $response, string $cookieName): ResponseInterface
     {
         return static::set($response, SetCookieCollection::createExpired($cookieName));
     }
 
-    /**
-     * Undocumented function
-     */
     public static function modify(ResponseInterface $response, string $name, callable $modify): ResponseInterface
     {
         if (! is_callable($modify)) {
@@ -76,9 +66,6 @@ class CookiesResponse
             ->renderIntoSetCookieHeader($response);
     }
 
-    /**
-     * Undocumented function
-     */
     public static function remove(ResponseInterface $response, string $name): ResponseInterface
     {
         return SetCookies::fromResponse($response)

@@ -3,10 +3,11 @@
 /**
  * Qubus\Http
  *
- * @since      1.0.0
- * @license    https://opensource.org/licenses/mit-license.php MIT License
- * @copyright  2020 Joshua Parker
  * @link       https://github.com/QubusPHP/http
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @license    https://opensource.org/licenses/mit-license.php MIT License
+ *
+ * @since      1.0.0
  */
 
 declare(strict_types=1);
@@ -15,6 +16,8 @@ namespace Qubus\Tests\Http\Cookies\Validation;
 
 use PHPUnit\Framework\TestCase;
 use Qubus\Http\Cookies\Validation\Validation;
+
+use function hash_hmac;
 
 class ValidationTest extends TestCase
 {
@@ -26,10 +29,10 @@ class ValidationTest extends TestCase
         $value = 'hello world!';
 
         // We know how the hmac should be created.
-        $hmac = hash_hmac($algo, $key, $nonce.$value);
+        $hmac = hash_hmac($algo, $key, $nonce . $value);
 
         // We know what the signed value should be.
-        $signedValue = $nonce.$value.'.'.$hmac;
+        $signedValue = $nonce . $value . '.' . $hmac;
 
         $validation = new Validation($key, $algo);
 
@@ -37,7 +40,7 @@ class ValidationTest extends TestCase
 
         $this->assertEquals($value, $extractedValue);
     }
-    
+
     public function testSignsSuccessfully()
     {
         $algo = 'sha256';

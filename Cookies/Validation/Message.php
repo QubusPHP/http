@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -20,28 +20,24 @@ use function substr;
 
 class Message
 {
-    private $nonce;
-    private $hmac;
-    private $value;
-
-    private function __construct($nonce, $hmac, $value)
-    {
-        $this->nonce = $nonce;
-        $this->hmac = $hmac;
-        $this->value = $value;
+    private function __construct(
+        public readonly string $nonce,
+        public readonly string $hmac,
+        public readonly string $value,
+    ) {
     }
 
-    public function getNonce()
+    public function getNonce(): string
     {
         return $this->nonce;
     }
 
-    public function getHmac()
+    public function getHmac(): string
     {
         return $this->hmac;
     }
 
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }

@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -20,14 +20,11 @@ use Qubus\Http\Cookies\Encryption\Encryption;
 
 class DefuseEncryption implements Encryption
 {
-    private Key $key;
-
     /**
      * @param string $key
      */
-    public function __construct(Key $key)
+    public function __construct(public readonly Key $key)
     {
-        $this->key = $key;
     }
 
     public function decrypt($value)

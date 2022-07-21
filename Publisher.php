@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -26,5 +26,5 @@ interface Publisher
      * @param ResponseInterface|StreamInterface $content
      * @param null|EmitterInterface             $emitter
      */
-    public function publish($content, ?EmitterInterface $response): bool;
+    public function publish(ResponseInterface|StreamInterface $content, ?EmitterInterface $response): bool;
 }

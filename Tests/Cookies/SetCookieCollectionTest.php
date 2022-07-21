@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Beau Simensen <beau@dflydev.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -14,12 +15,13 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Http\Cookies;
 
+use Carbon\CarbonImmutable;
 use PHPUnit\Framework\TestCase;
 use Qubus\Http\Cookies\SameSite;
-use Qubus\Exception\Data\TypeException;
 use Qubus\Http\Cookies\SetCookieCollection;
 use Qubus\ValueObjects\DateTime\DateTime;
-use Carbon\CarbonImmutable;
+
+use function time;
 
 class SetCookieCollectionTest extends TestCase
 {
@@ -158,7 +160,7 @@ class SetCookieCollectionTest extends TestCase
     /**
      * @test
      */
-    public function testExpiresCookies() : void
+    public function testExpiresCookies(): void
     {
         $setCookie = SetCookieCollection::createExpired('expire_immediately');
 
@@ -215,7 +217,7 @@ class SetCookieCollectionTest extends TestCase
      * @test
      * @expectedException \Qubus\Exception\Data\TypeException
      */
-    public function testEmptyCookieIsRejected() : void
+    public function testEmptyCookieIsRejected(): void
     {
         $this->expectExceptionMessage('The provided cookie string "" must have at least one attribute.');
 

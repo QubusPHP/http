@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -39,7 +39,8 @@ use function urlencode;
 
 class Url extends Uri implements UriInterface, JsonSerializable
 {
-    private ?string $originalUrl = null;
+    private null|string $originalUrl = null;
+
     private string $scheme = '';
 
     private string $username = '';
@@ -48,14 +49,14 @@ class Url extends Uri implements UriInterface, JsonSerializable
 
     private string $host = '';
 
-    private ?int $port = null;
+    private null|int|string $port = null;
 
     private string $path = '';
 
     /** @var array $params */
     private array $params = [];
 
-    private ?string $fragment = null;
+    private null|string $fragment = null;
 
     /**
      * @throws MalformedUrlException
@@ -70,7 +71,7 @@ class Url extends Uri implements UriInterface, JsonSerializable
             $this->scheme = $data['scheme'] ?? null;
             $this->host = $data['host'] ?? null;
             $this->port = $data['port'] ?? null;
-            $this->username = isset($data['user']) ? $this->filterUserInfoPart($data['user']) : '';
+            $this->username = isset($data['user']) ? $this->withUserInfo($data['user']) : '';
             $this->password = isset($data['pass']) ? ':' . $data['pass'] : '';
 
             if (isset($data['path']) === true) {
@@ -265,7 +266,7 @@ class Url extends Uri implements UriInterface, JsonSerializable
      * Get parameter by name.
      * Returns parameter value or default value.
      */
-    public function getParam(string $name, ?string $defaultValue = null): ?string
+    public function getParam(string $name, ?string $defaultValue): ?string
     {
         return isset($this->getParams()[$name]) ?? $defaultValue;
     }

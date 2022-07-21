@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Beau Simensen <beau@dflydev.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -15,14 +16,16 @@ declare(strict_types=1);
 namespace Qubus\Tests\Http\Cookies;
 
 use PHPUnit\Framework\TestCase;
-use Qubus\Tests\Http\Cookies\CookieRequestTesting;
-use Qubus\Tests\Http\Cookies\CookieResponseTesting;
+use Qubus\Http\Cookies\CookieCollection;
 use Qubus\Http\Cookies\Cookies;
 use Qubus\Http\Cookies\CookiesRequest;
-use Qubus\Http\Cookies\SetCookies;
-use Qubus\Http\Cookies\SetCookieCollection;
 use Qubus\Http\Cookies\CookiesResponse;
-use Qubus\Http\Cookies\CookieCollection;
+use Qubus\Http\Cookies\SetCookieCollection;
+use Qubus\Http\Cookies\SetCookies;
+use Qubus\Tests\Http\Cookies\CookieRequestTesting;
+use Qubus\Tests\Http\Cookies\CookieResponseTesting;
+
+use function str_rot13;
 
 class CookiesTest extends TestCase
 {
@@ -40,7 +43,7 @@ class CookiesTest extends TestCase
         // Get our token from an encrypted cookie value, "decrypt" it, and replace the cookie on the request.
         // From here on out, any part of the system that gets our token will be able to see the contents
         // in plaintext.
-        $request = CookiesRequest::modify($request, 'sessionToken', function (CookieCollection $cookie) : CookieCollection {
+        $request = CookiesRequest::modify($request, 'sessionToken', function (CookieCollection $cookie): CookieCollection {
             return $cookie->withValue(str_rot13($cookie->getValue()));
         });
 
@@ -52,7 +55,7 @@ class CookiesTest extends TestCase
         );
 
         // Simulate a response going out.
-        $response = (new CookieResponseTesting());
+        $response = new CookieResponseTesting();
 
         // Various parts of the system will add set cookies to the response. In this case, we are
         // going to show that the rest of the system interacts with the session token using

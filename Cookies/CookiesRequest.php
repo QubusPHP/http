@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Beau Simensen <beau@dflydev.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -22,11 +23,8 @@ use Qubus\Http\Cookies\Cookies;
 use function is_callable;
 use function sprintf;
 
-class CookiesRequest
+final class CookiesRequest
 {
-    /**
-     * Undocumented function
-     */
     public static function get(RequestInterface $request, string $name, ?string $value = null): CookieCollection
     {
         $cookies = Cookies::fromRequest($request);
@@ -39,9 +37,6 @@ class CookiesRequest
         return CookieCollection::create($name, $value);
     }
 
-    /**
-     * Undocumented function
-     */
     public static function set(RequestInterface $request, CookieCollection $cookie): RequestInterface
     {
         return Cookies::fromRequest($request)
@@ -49,9 +44,6 @@ class CookiesRequest
             ->renderIntoCookieHeader($request);
     }
 
-    /**
-     * Undocumented function
-     */
     public static function modify(RequestInterface $request, string $name, callable $modify): RequestInterface
     {
         if (! is_callable($modify)) {
@@ -70,9 +62,6 @@ class CookiesRequest
             ->renderIntoCookieHeader($request);
     }
 
-    /**
-     * Undocumented function
-     */
     public static function remove(RequestInterface $request, string $name): RequestInterface
     {
         return Cookies::fromRequest($request)

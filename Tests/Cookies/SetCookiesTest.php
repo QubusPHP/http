@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Beau Simensen <beau@dflydev.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -15,20 +16,24 @@ declare(strict_types=1);
 namespace Qubus\Tests\Http\Cookies;
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Http\Message\ResponseInterface;
+use Qubus\Http\Cookies\SetCookieCollection;
 use Qubus\Http\Cookies\SetCookies;
 use Qubus\Tests\Http\Cookies\CookieResponseTesting;
-use Qubus\Http\Cookies\SetCookieCollection;
+
+use function str_rot13;
 
 class SetCookiesTest extends TestCase
 {
+    use ProphecyTrait;
+
     public const INTERFACE_PSR_HTTP_MESSAGE_RESPONSE = ResponseInterface::class;
 
     /**
      * @param string[]    $setCookieStrings
      * @param SetCookieCollection[] $expectedSetCookies
-     *
      * @test
      * @dataProvider provideSetCookieStringsAndExpectedSetCookiesData
      */
@@ -46,7 +51,6 @@ class SetCookiesTest extends TestCase
     /**
      * @param string[]              $setCookieStrings
      * @param SetCookieCollection[] $expectedSetCookies
-     *
      * @test
      * @dataProvider provideSetCookieStringsAndExpectedSetCookiesData
      */
@@ -60,7 +64,6 @@ class SetCookiesTest extends TestCase
     /**
      * @param string[]              $setCookieStrings
      * @param SetCookieCollection[] $expectedSetCookies
-     *
      * @test
      * @dataProvider provideSetCookieStringsAndExpectedSetCookiesData
      */
@@ -77,7 +80,6 @@ class SetCookiesTest extends TestCase
 
     /**
      * @param string[] $setCookieStrings
-     *
      * @test
      * @dataProvider provideGetsSetCookieByNameData
      */
@@ -99,8 +101,7 @@ class SetCookiesTest extends TestCase
         $setCookies = SetCookies::fromSetCookieStrings(['theme=light', 'sessionToken=abc123', 'hello=world'])
             ->with(SetCookieCollection::create('theme', 'blue'))
             ->without('sessionToken')
-            ->with(SetCookieCollection::create('who', 'me'))
-        ;
+            ->with(SetCookieCollection::create('who', 'me'));
 
         $originalResponse = new CookieResponseTesting();
         $response         = $setCookies->renderIntoSetCookieHeader($originalResponse);
@@ -200,7 +201,7 @@ class SetCookiesTest extends TestCase
     }
 
     /** @return string[][]|string[][][]|SetCookie[][]|null[][] */
-    public function provideGetsSetCookieByNameData() : array
+    public function provideGetsSetCookieByNameData(): array
     {
         return [
             [

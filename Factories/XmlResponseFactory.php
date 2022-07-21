@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -15,8 +15,10 @@ declare(strict_types=1);
 namespace Qubus\Http\Factories;
 
 use Laminas\Diactoros\Response\XmlResponse;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
-class XmlResponseFactory
+final class XmlResponseFactory
 {
     /**
      * Create an XML response.
@@ -29,8 +31,11 @@ class XmlResponseFactory
      * @param array $headers Array of headers to use at initialization.
      * @throws Exception\InvalidArgumentException If $text is neither a string or stream.
      */
-    public static function create($xml, int $status = 200, array $headers = [])
-    {
+    public static function create(
+        string|StreamInterface $xml,
+        int $status = 200,
+        array $headers = []
+    ): ResponseInterface {
         return new XmlResponse($xml, $status, $headers);
     }
 }

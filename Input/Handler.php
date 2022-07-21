@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2016 Simon Sessingø (aka skipperbent) <simon.sessingoe@gmail.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -42,11 +43,8 @@ class Handler
     /** @var array $file */
     protected array $file = [];
 
-    protected ?RequestInterface $request = null;
-
-    public function __construct(RequestInterface $request)
+    public function __construct(public readonly RequestInterface $request)
     {
-        $this->request = $request;
         $this->parseInputs();
     }
 
@@ -111,7 +109,7 @@ class Handler
      * @param array      $index
      * @param array|null $original
      */
-    protected function rearrangeFile(array $values, &$index, $original): array
+    protected function rearrangeFile(array $values, &$index, $original): ?array
     {
         $originalIndex = $index[0];
         array_shift($index);

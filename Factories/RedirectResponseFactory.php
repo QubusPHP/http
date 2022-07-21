@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -15,8 +15,10 @@ declare(strict_types=1);
 namespace Qubus\Http\Factories;
 
 use Laminas\Diactoros\Response\RedirectResponse;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 
-class RedirectResponseFactory
+final class RedirectResponseFactory
 {
     /**
      * Create a redirect response.
@@ -30,8 +32,11 @@ class RedirectResponseFactory
      * @param int $status Integer status code for the redirect; 302 by default.
      * @param array $headers Array of headers to use at initialization.
      */
-    public static function create($uri, int $status = 302, array $headers = [])
-    {
+    public static function create(
+        string|UriInterface $uri,
+        int $status = 302,
+        array $headers = []
+    ): ResponseInterface {
         return new RedirectResponse($uri, $status, $headers);
     }
 }

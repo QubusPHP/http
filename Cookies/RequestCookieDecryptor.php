@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -25,27 +25,23 @@ use function is_array;
 
 class RequestCookieDecryptor
 {
-    private Decryptor $decryptor;
-
-    private Validation $validation;
-
-    public function __construct(Decryptor $decryptor, Validation $validaton)
-    {
-        $this->decryptor = $decryptor;
-        $this->validation = $validaton;
+    public function __construct(
+        public readonly Decryptor $decryptor,
+        public readonly Validation $validation,
+    ) {
     }
 
-    private static function resolveCookieNames($cookieNames)
+    private static function resolveCookieNames($cookieNames): array
     {
-        return is_array($cookieNames) ? $cookieNames : [(string) $cookieNames];
+        return is_array($cookieNames) ? $cookieNames : [$cookieNames];
     }
 
-    private static function hasNoCookieNames(array $cookieNames)
+    private static function hasNoCookieNames(array $cookieNames): bool
     {
         return count($cookieNames) < 1;
     }
 
-    public function decrypt(RequestInterface $request, $cookieNames)
+    public function decrypt(RequestInterface $request, $cookieNames): RequestInterface
     {
         $cookieNames = self::resolveCookieNames($cookieNames);
 
@@ -62,7 +58,7 @@ class RequestCookieDecryptor
         return $cookies->renderIntoCookieHeader($request);
     }
 
-    private function decryptCookie(Cookies $cookies, $cookieName)
+    private function decryptCookie(Cookies $cookies, $cookieName): Cookies
     {
         if (! $cookies->has($cookieName)) {
             return $cookies;

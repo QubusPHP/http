@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -36,7 +36,7 @@ class HttpPublisher implements Publisher
      *
      * @throws LogicException
      */
-    public function publish($content, ?EmitterInterface $emitter): bool
+    public function publish(ResponseInterface|StreamInterface $content, ?EmitterInterface $emitter): bool
     {
         $content = empty($content) ? '' : $content;
 
@@ -66,7 +66,7 @@ class HttpPublisher implements Publisher
                 }
             }
         }
-        return (new HtmlResponseFactory())->create(
+        return HtmlResponseFactory::create(
             'The response body must be an instance of ResponseInterface or StreamInterface',
             200,
             ['Content-Type' => ['application/xhtml+xml']]

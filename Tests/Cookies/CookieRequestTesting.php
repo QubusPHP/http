@@ -4,7 +4,8 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2015 Beau Simensen <beau@dflydev.com>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -15,9 +16,9 @@ declare(strict_types=1);
 namespace Qubus\Tests\Http\Cookies;
 
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use Qubus\Tests\Http\Cookies\CookieMessageTesting;
+use RuntimeException;
 
 class CookieRequestTesting implements RequestInterface
 {
@@ -25,34 +26,34 @@ class CookieRequestTesting implements RequestInterface
 
     public function getRequestTarget(): void
     {
-        throw new \RuntimeException('This method has not been implemented.');
+        throw new RuntimeException('This method has not been implemented.');
     }
 
     /** {@inheritDoc} */
     public function withRequestTarget($requestTarget): void
     {
-        throw new \RuntimeException('This method has not been implemented.');
+        throw new RuntimeException('This method has not been implemented.');
     }
 
     public function getMethod(): void
     {
-        throw new \RuntimeException('This method has not been implemented.');
+        throw new RuntimeException('This method has not been implemented.');
     }
 
     /** {@inheritDoc} */
     public function withMethod($method): void
     {
-        throw new \RuntimeException('This method has not been implemented.');
+        throw new RuntimeException('This method has not been implemented.');
     }
 
     public function getUri(): void
     {
-        throw new \RuntimeException('This method has not been implemented.');
+        throw new RuntimeException('This method has not been implemented.');
     }
 
     /** {@inheritDoc} */
     public function withUri(UriInterface $uri, $preserveHost = false): void
     {
-        throw new \RuntimeException('This method has not been implemented.');
+        throw new RuntimeException('This method has not been implemented.');
     }
 }

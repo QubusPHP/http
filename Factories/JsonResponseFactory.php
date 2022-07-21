@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker
+ * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  *
  * @since      1.0.0
@@ -15,8 +15,9 @@ declare(strict_types=1);
 namespace Qubus\Http\Factories;
 
 use Laminas\Diactoros\Response\JsonResponse;
+use Psr\Http\Message\ResponseInterface;
 
-class JsonResponseFactory
+final class JsonResponseFactory
 {
     /**
      * Create a JSON response with the given data.
@@ -32,7 +33,7 @@ class JsonResponseFactory
         int $status = 200,
         array $headers = [],
         int $encodingOptions = 79
-    ) {
+    ): ResponseInterface {
         return new JsonResponse($data, $status, $headers, $encodingOptions);
     }
 }
