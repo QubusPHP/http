@@ -71,7 +71,7 @@ class Url extends Uri implements UriInterface, JsonSerializable
             $this->scheme = $data['scheme'] ?? null;
             $this->host = $data['host'] ?? null;
             $this->port = $data['port'] ?? null;
-            $this->username = isset($data['user']) ? $this->filterUserInfoPart($data['user']) : '';
+            $this->username = isset($data['user']) ? $this->withUserInfo($data['user']) : '';
             $this->password = isset($data['pass']) ? ':' . $data['pass'] : '';
 
             if (isset($data['path']) === true) {
