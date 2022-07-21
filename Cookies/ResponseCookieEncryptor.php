@@ -25,27 +25,23 @@ use function is_array;
 
 class ResponseCookieEncryptor
 {
-    private Encryptor $encryptor;
-
-    private Validation $validation;
-
-    public function __construct(Encryptor $encryptor, Validation $validation)
-    {
-        $this->encryptor = $encryptor;
-        $this->validation = $validation;
+    public function __construct(
+        public readonly Encryptor $encryptor,
+        public readonly Validation $validation,
+    ) {
     }
 
-    private static function resolveCookieNames($cookieNames)
+    private static function resolveCookieNames($cookieNames): array
     {
-        return is_array($cookieNames) ? $cookieNames : [(string) $cookieNames];
+        return is_array($cookieNames) ? $cookieNames : [$cookieNames];
     }
 
-    private static function hasNoCookieNames(array $cookieNames)
+    private static function hasNoCookieNames(array $cookieNames): bool
     {
         return count($cookieNames) < 1;
     }
 
-    public function encrypt(ResponseInterface $response, $cookieNames)
+    public function encrypt(ResponseInterface $response, $cookieNames): ResponseInterface
     {
         $cookieNames = self::resolveCookieNames($cookieNames);
 
@@ -62,7 +58,7 @@ class ResponseCookieEncryptor
         return $setCookies->renderIntoSetCookieHeader($response);
     }
 
-    private function encryptCookie(SetCookies $setCookies, $cookieName)
+    private function encryptCookie(SetCookies $setCookies, $cookieName): SetCookies
     {
         if (! $setCookies->has($cookieName)) {
             return $setCookies;

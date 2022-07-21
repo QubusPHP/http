@@ -20,14 +20,11 @@ use Qubus\Http\Cookies\Encryption\Encryption;
 
 class DefuseEncryption implements Encryption
 {
-    private Key $key;
-
     /**
      * @param string $key
      */
-    public function __construct(Key $key)
+    public function __construct(public readonly Key $key)
     {
-        $this->key = $key;
     }
 
     public function decrypt($value)

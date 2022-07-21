@@ -17,7 +17,7 @@ namespace Qubus\Http\Cookies;
 use function array_map;
 use function urlencode;
 
-class CookieCollection
+final class CookieCollection
 {
     private ?string $name = null;
 
@@ -32,7 +32,7 @@ class CookieCollection
     /**
      * Get cookie name.
      */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }

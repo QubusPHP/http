@@ -26,5 +26,5 @@ interface Publisher
      * @param ResponseInterface|StreamInterface $content
      * @param null|EmitterInterface             $emitter
      */
-    public function publish($content, ?EmitterInterface $response): bool;
+    public function publish(ResponseInterface|StreamInterface $content, ?EmitterInterface $response): bool;
 }

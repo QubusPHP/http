@@ -33,7 +33,7 @@ use function strtolower;
 use function strtotime;
 use function urlencode;
 
-class SetCookieCollection
+final class SetCookieCollection
 {
     private ?string $name = null;
     private ?string $value = null;
@@ -136,8 +136,6 @@ class SetCookieCollection
     }
 
     /**
-     * Undocumented function
-     *
      * @param int|DateTimeInterface|string|null $expires
      */
     private function resolveExpires($expires = null): int
@@ -184,9 +182,6 @@ class SetCookieCollection
         return $clone;
     }
 
-    /**
-     * Undocumented function
-     */
     public function rememberForever(): self
     {
         return $this->withExpires(new DateTime('+5 years'));

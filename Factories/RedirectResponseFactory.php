@@ -16,9 +16,9 @@ namespace Qubus\Http\Factories;
 
 use Laminas\Diactoros\Response\RedirectResponse;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriInterface;
 
-class RedirectResponseFactory
+final class RedirectResponseFactory
 {
     /**
      * Create a redirect response.
@@ -33,7 +33,7 @@ class RedirectResponseFactory
      * @param array $headers Array of headers to use at initialization.
      */
     public static function create(
-        string|StreamInterface $uri,
+        string|UriInterface $uri,
         int $status = 302,
         array $headers = []
     ): ResponseInterface {

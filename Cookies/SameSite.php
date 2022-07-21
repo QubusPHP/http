@@ -28,11 +28,8 @@ final class SameSite
     private const LAX    = 'Lax';
     private const NONE   = 'None';
 
-    private ?string $value = null;
-
-    private function __construct(string $value)
+    private function __construct(private string $value)
     {
-        $this->value = $value;
     }
 
     public static function strict(): self
@@ -73,7 +70,7 @@ final class SameSite
 
         throw new TypeException(
             sprintf(
-                'Expected modifier value to be either "strict", "lax", or "none", "%s" given',
+                'Expected modifier value to be either "strict", "lax", or "none", "%s" given.',
                 $sameSite
             )
         );

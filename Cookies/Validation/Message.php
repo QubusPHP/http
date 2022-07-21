@@ -20,28 +20,24 @@ use function substr;
 
 class Message
 {
-    private $nonce;
-    private $hmac;
-    private $value;
-
-    private function __construct($nonce, $hmac, $value)
-    {
-        $this->nonce = $nonce;
-        $this->hmac = $hmac;
-        $this->value = $value;
+    private function __construct(
+        public readonly string $nonce,
+        public readonly string $hmac,
+        public readonly string $value,
+    ) {
     }
 
-    public function getNonce()
+    public function getNonce(): string
     {
         return $this->nonce;
     }
 
-    public function getHmac()
+    public function getHmac(): string
     {
         return $this->hmac;
     }
 
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }

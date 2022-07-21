@@ -18,7 +18,7 @@ use Laminas\Diactoros\Response\TextResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class TextResponseFactory
+final class TextResponseFactory
 {
     /**
      * Create a plain text response.

@@ -22,11 +22,8 @@ use Qubus\Http\Cookies\Cookies;
 use function is_callable;
 use function sprintf;
 
-class CookiesRequest
+final class CookiesRequest
 {
-    /**
-     * Undocumented function
-     */
     public static function get(RequestInterface $request, string $name, ?string $value = null): CookieCollection
     {
         $cookies = Cookies::fromRequest($request);
@@ -39,9 +36,6 @@ class CookiesRequest
         return CookieCollection::create($name, $value);
     }
 
-    /**
-     * Undocumented function
-     */
     public static function set(RequestInterface $request, CookieCollection $cookie): RequestInterface
     {
         return Cookies::fromRequest($request)
@@ -49,9 +43,6 @@ class CookiesRequest
             ->renderIntoCookieHeader($request);
     }
 
-    /**
-     * Undocumented function
-     */
     public static function modify(RequestInterface $request, string $name, callable $modify): RequestInterface
     {
         if (! is_callable($modify)) {
@@ -70,9 +61,6 @@ class CookiesRequest
             ->renderIntoCookieHeader($request);
     }
 
-    /**
-     * Undocumented function
-     */
     public static function remove(RequestInterface $request, string $name): RequestInterface
     {
         return Cookies::fromRequest($request)

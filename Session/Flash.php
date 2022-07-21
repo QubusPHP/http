@@ -66,17 +66,12 @@ class Flash
     protected ?string $redirectUrl = null;
 
     /** @var string $msgId */
-    protected $msgId;
+    public readonly string $msgId;
 
-    protected ?Session $session = null;
-
-    public function __construct(Session $session)
+    public function __construct(public readonly PhpSession $session)
     {
-        $this->session = $session;
-
         // Generate a unique ID for this user and session
         $this->msgId = sha1(uniqid());
-
         // Create session array to hold our messages if it doesn't already exist
         if (! array_key_exists('flash', $this->session->getAll())) {
             $this->session->set('flash', []);
@@ -158,7 +153,7 @@ class Flash
      */
     public function hasErrors()
     {
-        return empty($this->session->get('flash')[self::ERROR]) ? false : true;
+        return empty($this->session->get('flash')[MessageType::ERROR]) ? false : true;
     }
 
     /**

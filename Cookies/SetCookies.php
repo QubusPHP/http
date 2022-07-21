@@ -20,7 +20,7 @@ use Qubus\Http\Cookies\SetCookieCollection;
 use function array_map;
 use function array_values;
 
-class SetCookies
+final class SetCookies
 {
     /**
      * The name of the Set-Cookie header.
@@ -101,9 +101,12 @@ class SetCookies
      */
     public static function fromSetCookieStrings(array $setCookieStrings): self
     {
-        return new static(array_map(function (string $setCookieString): SetCookieCollection {
-            return SetCookieCollection::fromSetCookieString($setCookieString);
-        }, $setCookieStrings));
+        return new static(
+            array_map(
+                fn (string $setCookieString): SetCookieCollection => SetCookieCollection::fromSetCookieString($setCookieString),
+                $setCookieStrings
+            )
+        );
     }
 
     /**
@@ -111,8 +114,11 @@ class SetCookies
      */
     public static function fromResponse(ResponseInterface $response): SetCookies
     {
-        return new static(array_map(function (string $setCookieString): SetCookieCollection {
-            return SetCookieCollection::fromSetCookieString($setCookieString);
-        }, $response->getHeader(static::SET_COOKIE_HEADER)));
+        return new static(
+            array_map(
+                fn (string $setCookieString): SetCookieCollection => SetCookieCollection::fromSetCookieString($setCookieString),
+                $response->getHeader(static::SET_COOKIE_HEADER)
+            )
+        );
     }
 }

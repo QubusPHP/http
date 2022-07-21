@@ -26,8 +26,8 @@ class Validation
     public const DEFAULT_ALGO = 'sha256';
     public const NONCE_LENGTH = 32;
 
-    private $key;
-    private $algo;
+    public readonly string $key;
+    public readonly string $algo;
 
     public function __construct($key, $algo = null)
     {
@@ -35,7 +35,7 @@ class Validation
         $this->algo = $algo ?: static::DEFAULT_ALGO;
     }
 
-    public function extract($value)
+    public function extract($value): string
     {
         $message = Message::fromString($value);
 
@@ -46,7 +46,7 @@ class Validation
         return $message->getValue();
     }
 
-    public function sign($value)
+    public function sign($value): string|false
     {
         $nonce = $this->generateNonce();
 
@@ -55,18 +55,18 @@ class Validation
         return $nonce . $value . '.' . $hmac;
     }
 
-    private function verify(Message $message)
+    private function verify(Message $message): bool
     {
-        $calcualtedHmac = hash_hmac(
+        $calculatedHmac = hash_hmac(
             $this->algo,
             $this->key,
             $message->getNonce() . $message->getValue()
         );
 
-        return self::hashCompare($calcualtedHmac, $message->getHmac());
+        return self::hashCompare($calculatedHmac, $message->getHmac());
     }
 
-    private static function generateNonce()
+    private static function generateNonce(): string
     {
         $result = '';
         for ($i = 0; $i < static::NONCE_LENGTH; $i++) {
@@ -75,7 +75,7 @@ class Validation
         return $result;
     }
 
-    private static function hashCompare($hash1, $hash2)
+    private static function hashCompare($hash1, $hash2): bool
     {
         return hash_equals($hash1, $hash2);
     }

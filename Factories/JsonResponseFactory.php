@@ -17,7 +17,7 @@ namespace Qubus\Http\Factories;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 
-class JsonResponseFactory
+final class JsonResponseFactory
 {
     /**
      * Create a JSON response with the given data.

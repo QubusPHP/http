@@ -17,7 +17,7 @@ namespace Qubus\Http\Factories;
 use Laminas\Diactoros\Response\EmptyResponse;
 use Psr\Http\Message\ResponseInterface;
 
-class EmptyResponseFactory
+final class EmptyResponseFactory
 {
     /**
      * Create an empty response with the given status code.

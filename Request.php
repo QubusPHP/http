@@ -32,7 +32,7 @@ use function strpos;
 use function strtolower;
 use function strtoupper;
 
-class Request extends BaseRequest implements RequestInterface
+final class Request extends BaseRequest implements RequestInterface
 {
     /**
      * Additional data.
@@ -189,7 +189,8 @@ class Request extends BaseRequest implements RequestInterface
      */
     public function getHttpHeader(string $name, ?string $defaultValue = null): ?string
     {
-        return $this->httpHeaders[strtolower($name)] ?? $defaultValue;
+        $name = strtolower(str_replace('_', '-', $name));
+        return $this->httpHeaders[$name] ?? $defaultValue;
     }
 
     /**
@@ -524,20 +525,11 @@ class Request extends BaseRequest implements RequestInterface
      */
     public function isValidHttpMethod(string $method): bool
     {
-        switch (strtoupper($method)) {
-            case 'GET':
-            case 'POST':
-            case 'PUT':
-            case 'DELETE':
-            case 'HEAD':
-            case 'OPTIONS':
-            case 'PATCH':
-            case 'TRACE':
-            case 'CONNECT':
-                return true;
-        }
-
-        return false;
+        return match(strtoupper($method)) {
+            'GET','POST','PUT','DELETE','HEAD','OPTIONS',
+            'PATCH','TRACE','CONNECT' => true,
+            default => false,
+        };
     }
 
     protected function getServerArray(): array

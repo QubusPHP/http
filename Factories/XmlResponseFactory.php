@@ -18,7 +18,7 @@ use Laminas\Diactoros\Response\XmlResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class XmlResponseFactory
+final class XmlResponseFactory
 {
     /**
      * Create an XML response.

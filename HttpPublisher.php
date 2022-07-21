@@ -36,7 +36,7 @@ class HttpPublisher implements Publisher
      *
      * @throws LogicException
      */
-    public function publish($content, ?EmitterInterface $emitter): bool
+    public function publish(ResponseInterface|StreamInterface $content, ?EmitterInterface $emitter): bool
     {
         $content = empty($content) ? '' : $content;
 

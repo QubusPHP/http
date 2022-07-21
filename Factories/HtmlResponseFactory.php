@@ -18,7 +18,7 @@ use Laminas\Diactoros\Response\HtmlResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class HtmlResponseFactory
+final class HtmlResponseFactory
 {
     /**
      * Create an HTML response.

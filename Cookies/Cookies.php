@@ -20,7 +20,7 @@ use Qubus\Http\Cookies\CookieCollection;
 use function array_values;
 use function implode;
 
-class Cookies
+final class Cookies
 {
     /**
      * The name of the Cookie header.

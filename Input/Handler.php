@@ -42,11 +42,8 @@ class Handler
     /** @var array $file */
     protected array $file = [];
 
-    protected ?RequestInterface $request = null;
-
-    public function __construct(RequestInterface $request)
+    public function __construct(public readonly RequestInterface $request)
     {
-        $this->request = $request;
         $this->parseInputs();
     }
 
@@ -111,7 +108,7 @@ class Handler
      * @param array      $index
      * @param array|null $original
      */
-    protected function rearrangeFile(array $values, &$index, $original): array
+    protected function rearrangeFile(array $values, &$index, $original): ?array
     {
         $originalIndex = $index[0];
         array_shift($index);

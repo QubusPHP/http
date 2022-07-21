@@ -39,7 +39,8 @@ use function urlencode;
 
 class Url extends Uri implements UriInterface, JsonSerializable
 {
-    private ?string $originalUrl = null;
+    private null|string $originalUrl = null;
+
     private string $scheme = '';
 
     private string $username = '';
@@ -48,14 +49,14 @@ class Url extends Uri implements UriInterface, JsonSerializable
 
     private string $host = '';
 
-    private ?int $port = null;
+    private null|int|string $port = null;
 
     private string $path = '';
 
     /** @var array $params */
     private array $params = [];
 
-    private ?string $fragment = null;
+    private null|string $fragment = null;
 
     /**
      * @throws MalformedUrlException
@@ -265,7 +266,7 @@ class Url extends Uri implements UriInterface, JsonSerializable
      * Get parameter by name.
      * Returns parameter value or default value.
      */
-    public function getParam(string $name, ?string $defaultValue = null): ?string
+    public function getParam(string $name, ?string $defaultValue): ?string
     {
         return isset($this->getParams()[$name]) ?? $defaultValue;
     }

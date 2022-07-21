@@ -17,7 +17,7 @@ namespace Qubus\Http;
 use Laminas\Diactoros\Response as BaseResponse;
 use Psr\Http\Message\ResponseInterface;
 
-class Response extends BaseResponse implements ResponseInterface
+final class Response extends BaseResponse implements ResponseInterface
 {
     /**
      * @param string|resource|StreamInterface $body
