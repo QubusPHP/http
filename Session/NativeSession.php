@@ -37,14 +37,14 @@ class NativeSession implements PhpSession
 
     protected const SESSION_OPTIONS = [
         'use_cookies'            => 1,
-        'secure'                 => 1,
+        'cookie_secure'          => 1,
         'use_only_cookies'       => 1,
-        'secure'                 => 1,
+        'cookie_httponly'        => 1,
         'use_strict_mode'        => 1,
         'sid_bits_per_character' => 5,
         'sid_length'             => 48,
         'cache_limiter'          => 'nocache',
-        'samesite'               => 'Lax',
+        'cookie_samesite'        => 'Lax',
     ];
 
     public function __construct(
@@ -108,14 +108,14 @@ class NativeSession implements PhpSession
     {
         $config = [
             'use_cookies'            => $this->config->getConfigKey('session.use_cookies'),
-            'cookie_secure'          => $this->config->getConfigKey('session.secure'),
+            'cookie_secure'          => $this->config->getConfigKey('session.cookie_secure'),
             'use_only_cookies'       => $this->config->getConfigKey('session.use_only_cookies'),
-            'cookie_httponly'        => $this->config->getConfigKey('session.httponly'),
+            'cookie_httponly'        => $this->config->getConfigKey('session.cookie_httponly'),
             'use_strict_mode'        => $this->config->getConfigKey('session.use_strict_mode'),
             'sid_bits_per_character' => $this->config->getConfigKey('session.sid_bits_per_character'),
             'sid_length'             => $this->config->getConfigKey('session.sid_length'),
             'cache_limiter'          => $this->config->getConfigKey('session.cache_limiter'),
-            'cookie_samesite'        => $this->config->getConfigKey('session.samesite'),
+            'cookie_samesite'        => $this->config->getConfigKey('session.cookie_samesite'),
         ];
 
         return array_merge(self::SESSION_OPTIONS, $config);
