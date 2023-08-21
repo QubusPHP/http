@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Qubus\Http\Factories;
 
+use Exception;
+use InvalidArgumentException;
 use Laminas\Diactoros\Response\TextResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -29,7 +31,7 @@ final class TextResponseFactory
      * @param string|StreamInterface $text String or stream for the message body.
      * @param int $status Integer status code for the response; 200 by default.
      * @param array $headers Array of headers to use at initialization.
-     * @throws Exception\InvalidArgumentException If $text is neither a string or stream.
+     * @throws Exception|InvalidArgumentException If $text is neither a string or stream.
      */
     public static function create(
         string|StreamInterface $text,

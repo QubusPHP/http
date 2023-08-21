@@ -20,7 +20,10 @@
     <file>./HttpPublisher.php</file>
     <file>./Publisher.php</file>
     <file>./Request.php</file>
+    <file>./RequestHandler.php</file>
     <file>./Response.php</file>
+    <file>./ServerRequest.php</file>
+    <file>./ServerRequestFactory.php</file>
     <file>./Url.php</file>
 
     <!-- Include rules from the Qubus Coding Standard -->

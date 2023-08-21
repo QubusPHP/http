@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Qubus\Http;
 
+use Exception;
 use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
 use LogicException;
 use Psr\Http\Message\ResponseInterface;
@@ -34,10 +35,12 @@ class HttpPublisher implements Publisher
     /**
      * {@inheritdoc}
      *
-     * @throws LogicException
+     * @throws LogicException|Exception
      */
-    public function publish(ResponseInterface|StreamInterface $content, ?EmitterInterface $emitter): bool
-    {
+    public function publish(
+        ResponseInterface|StreamInterface $content,
+        ?EmitterInterface $emitter
+    ): bool|ResponseInterface {
         $content = empty($content) ? '' : $content;
 
         if (null !== $emitter && $content instanceof ResponseInterface) {

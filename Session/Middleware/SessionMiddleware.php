@@ -161,6 +161,9 @@ final class SessionMiddleware implements MiddlewareInterface
         return $response;
     }
 
+    /**
+     * @throws Exception
+     */
     private function getSessionLifetimeInSeconds(): int
     {
         return $this->cookie->config()->getConfigKey('cookies.lifetime', $this->options['lifetime']);

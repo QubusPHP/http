@@ -74,7 +74,7 @@ final class CookieCollection
      */
     public static function create(string $name, ?string $value = null): self
     {
-        return new static($name, $value);
+        return new self($name, $value);
     }
 
     /**
@@ -82,12 +82,12 @@ final class CookieCollection
      *
      * @return self[]
      */
-    public static function listFromCookieString(string $string)
+    public static function listFromCookieString(string $string): array
     {
         $cookies = Util::splitOnAttributeDelimiter($string);
 
         return array_map(function ($cookiePair) {
-            return static::oneFromCookiePair($cookiePair);
+            return self::oneFromCookiePair($cookiePair);
         }, $cookies);
     }
 
@@ -99,7 +99,7 @@ final class CookieCollection
         [$cookieName, $cookieValue] = Util::splitCookiePair($string);
 
         /** @var CookieCollection $cookie */
-        $cookie = new static($cookieName);
+        $cookie = new self($cookieName);
 
         if ($cookieValue !== null) {
             $cookie = $cookie->withValue($cookieValue);

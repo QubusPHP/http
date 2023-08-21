@@ -20,7 +20,8 @@ use Psr\Http\Message\ResponseInterface;
 final class Response extends BaseResponse implements ResponseInterface
 {
     /**
-     * @param string|resource|StreamInterface $body
+     * @param string $body
+     * @param int $status
      * @param array $headers
      */
     public function __construct($body = 'php://memory', int $status = 200, array $headers = [])

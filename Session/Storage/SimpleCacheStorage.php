@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace Qubus\Http\Session\Storage;
 
 use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class SimpleCacheStorage implements SessionStorage
 {
@@ -27,6 +28,7 @@ class SimpleCacheStorage implements SessionStorage
 
     /**
      * {@inheritDoc}
+     * @throws InvalidArgumentException
      */
     public function read(string $sessionId): ?array
     {
@@ -35,6 +37,7 @@ class SimpleCacheStorage implements SessionStorage
 
     /**
      * {@inheritDoc}
+     * @throws InvalidArgumentException
      */
     public function write(string $sessionId, array $data, int $ttl): void
     {
@@ -43,6 +46,7 @@ class SimpleCacheStorage implements SessionStorage
 
     /**
      * {@inheritDoc}
+     * @throws InvalidArgumentException
      */
     public function destroy(string $sessionId): void
     {

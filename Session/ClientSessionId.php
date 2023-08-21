@@ -21,15 +21,10 @@ class ClientSessionId extends Uuid implements Validatable
 {
     /**
      * Generate a Uuidv4 string.
+     * @throws TypeException
      */
     public static function create(?string $id = null): string
     {
-        $sessionId = (new self($id))->__toString();
-
-        if ($sessionId instanceof TypeException) {
-            throw new TypeException('String is not a valid Uuidv4 id.');
-        }
-
-        return $sessionId;
+        return (new self($id))->__toString();
     }
 }

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Qubus\Http\Session;
 
 use Qubus\Config\ConfigContainer;
+use Qubus\Exception\Exception;
 use SessionHandler;
 use SessionHandlerInterface;
 use Throwable;
@@ -65,6 +66,7 @@ class NativeSession implements PhpSession
      * Checks if session exists.
      *
      * @param string $name Session name.
+     * @throws SessionException
      */
     public function has(string $name): bool
     {
@@ -77,7 +79,8 @@ class NativeSession implements PhpSession
      * Retrieve session.
      *
      * @param string $name Session name.
-     * @return string
+     * @return string|array
+     * @throws SessionException
      */
     public function get(string $name): string|array
     {
@@ -90,7 +93,8 @@ class NativeSession implements PhpSession
      * Sets the session.
      *
      * @param string $name Session name.
-     * @param mixed  $value Value of the session set.
+     * @param mixed $value Value of the session set.
+     * @throws SessionException
      */
     public function set(string $name, $value): void
     {
@@ -103,6 +107,7 @@ class NativeSession implements PhpSession
      * Returns an array of session configOptions.
      *
      * @return array
+     * @throws Exception
      */
     public function configOptions(): array
     {
@@ -132,7 +137,8 @@ class NativeSession implements PhpSession
     /**
      * Returns the current session id if it exists. If not, it will be set.
      *
-     * @param string $sessionId Id of the session.
+     * @param string|null $id Id of the session.
+     * @return string|null
      */
     public function sessionId(?string $id = null): ?string
     {
@@ -145,6 +151,7 @@ class NativeSession implements PhpSession
 
     /**
      * Updates the current session ID with a new one.
+     * @throws SessionException
      */
     public function regenerateId(): void
     {
@@ -161,6 +168,7 @@ class NativeSession implements PhpSession
 
     /**
      * Starts a new session or resumes an existing session.
+     * @throws SessionException
      */
     public function startSession(): void
     {
@@ -201,6 +209,7 @@ class NativeSession implements PhpSession
 
     /**
      * Destroy specific session data by key.
+     * @throws SessionException
      */
     public function unsetSession(string $key): void
     {
@@ -212,6 +221,7 @@ class NativeSession implements PhpSession
      * Returns all session data.
      *
      * @return array
+     * @throws SessionException
      */
     public function getAll(): array
     {
@@ -219,6 +229,9 @@ class NativeSession implements PhpSession
         return $_SESSION;
     }
 
+    /**
+     * @throws SessionException
+     */
     public function clear(): void
     {
         $this->startSession();

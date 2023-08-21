@@ -18,8 +18,6 @@ namespace Qubus\Http\Cookies;
 use DateTime;
 use DateTimeInterface;
 use Qubus\Exception\Data\TypeException;
-use Qubus\Http\Cookies\SameSite;
-use Qubus\Http\Cookies\Util;
 
 use function array_shift;
 use function count;
@@ -137,9 +135,10 @@ final class SetCookieCollection
     }
 
     /**
-     * @param int|DateTimeInterface|string|null $expires
+     * @param DateTimeInterface|int|string|null $expires
+     * @throws TypeException
      */
-    private function resolveExpires($expires = null): int
+    private function resolveExpires(DateTimeInterface|int|string $expires = null): int
     {
         if ($expires === null) {
             return 0;
@@ -170,9 +169,10 @@ final class SetCookieCollection
     /**
      * Return an instance with the provided expiry.
      *
-     * @param int|string|DateTimeInterface|null $expires
+     * @param DateTimeInterface|int|string|null $expires
+     * @throws TypeException
      */
-    public function withExpires($expires = null): self
+    public function withExpires(DateTimeInterface|int|string $expires = null): self
     {
         $expires = $this->resolveExpires($expires);
 
@@ -183,11 +183,17 @@ final class SetCookieCollection
         return $clone;
     }
 
+    /**
+     * @throws TypeException
+     */
     public function rememberForever(): self
     {
         return $this->withExpires(new DateTime('+5 years'));
     }
 
+    /**
+     * @throws TypeException
+     */
     public function expire(): self
     {
         return $this->withExpires(new DateTime('-5 years'));
@@ -287,19 +293,28 @@ final class SetCookieCollection
 
     public static function create(string $name, ?string $value = null): self
     {
-        return new static($name, $value);
+        return new self($name, $value);
     }
 
+    /**
+     * @throws TypeException
+     */
     public static function createRememberedForever(string $name, ?string $value = null): self
     {
-        return static::create($name, $value)->rememberForever();
+        return self::create($name, $value)->rememberForever();
     }
 
+    /**
+     * @throws TypeException
+     */
     public static function createExpired(string $name): self
     {
-        return static::create($name)->expire();
+        return self::create($name)->expire();
     }
 
+    /**
+     * @throws TypeException
+     */
     public static function fromSetCookieString(string $string): self
     {
         $rawAttributes = Util::splitOnAttributeDelimiter($string);
@@ -318,7 +333,7 @@ final class SetCookieCollection
         [$cookieName, $cookieValue] = Util::splitCookiePair($rawAttribute);
 
         /** @var SetCookieCollection $setCookie */
-        $setCookie = new static($cookieName);
+        $setCookie = new self($cookieName);
 
         if ($cookieValue !== null) {
             $setCookie = $setCookie->withValue($cookieValue);

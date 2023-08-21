@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Qubus\Http\Factories;
 
+use Exception;
+use InvalidArgumentException;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 
@@ -26,7 +28,7 @@ final class JsonResponseFactory
      * @param int $status Integer status code for the response; 200 by default.
      * @param array $headers Array of headers to use at initialization.
      * @param int $encodingOptions JSON encoding options to use.
-     * @throws Exception\InvalidArgumentException If unable to encode the $data to JSON.
+     * @throws Exception|InvalidArgumentException If unable to encode the $data to JSON.
      */
     public static function create(
         $data,

@@ -17,6 +17,8 @@ declare(strict_types=1);
 
 namespace Qubus\Http\Session;
 
+use Qubus\Exception\Data\TypeException;
+
 interface HttpSession
 {
     public const COOKIE_NAME = "HTTPSESSID";
@@ -63,7 +65,7 @@ interface HttpSession
      *
      * @return void
      */
-    public function renew();
+    public function renew(): void;
 
     /**
      * Returns the session's uuid which is derived
