@@ -17,9 +17,11 @@ declare(strict_types=1);
 
 namespace Qubus\Http\Session;
 
+use Exception;
 use Qubus\Exception\Data\TypeException;
 use Qubus\Support\Serializer\JsonSerializer;
 use ReflectionClass;
+use ReflectionException;
 
 use function class_exists;
 use function md5_file;
@@ -32,7 +34,7 @@ final class SessionData implements HttpSession
     private ?string $oldSessionId = null;
 
     /** @var SessionEntity[] */
-    private $objects = [];
+    private array $objects = [];
 
     private function __construct(
         /** @var string client session id. */
@@ -49,6 +51,7 @@ final class SessionData implements HttpSession
 
     /**
      * {@inheritDoc}
+     * @throws Exception
      */
     public function sessionId(): string
     {
@@ -65,6 +68,7 @@ final class SessionData implements HttpSession
 
     /**
      * {@inheritDoc}
+     * @throws ReflectionException
      */
     public function getData(): array
     {
@@ -85,6 +89,7 @@ final class SessionData implements HttpSession
 
     /**
      * {@inheritDoc}
+     * @throws TypeException|ReflectionException
      */
     public function get(string $type): SessionEntity
     {
@@ -109,6 +114,7 @@ final class SessionData implements HttpSession
 
     /**
      * {@inheritDoc}
+     * @throws Exception
      */
     public function clear(): void
     {
@@ -123,8 +129,9 @@ final class SessionData implements HttpSession
 
     /**
      * {@inheritDoc}
+     * @throws Exception
      */
-    public function renew()
+    public function renew(): void
     {
         if (! $this->isRenewed()) {
             $this->oldSessionId = $this->sessionID();
@@ -157,6 +164,7 @@ final class SessionData implements HttpSession
      *
      * @param string $type fully-qualified class-name
      * @return string MD5 checksum
+     * @throws ReflectionException
      */
     protected function checksum(string $type): string
     {

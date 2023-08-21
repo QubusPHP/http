@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Qubus\Http\Cookies\Factory;
 
 use Qubus\Config\ConfigContainer;
+use Qubus\Exception\Data\TypeException;
 use Qubus\Exception\Exception;
 use Qubus\Http\Cookies\SameSite;
 use Qubus\Http\Cookies\SetCookieCollection;
@@ -32,6 +33,8 @@ class CookieFactory
      * Make a new cookie instance.
      *
      * This method returns a cookie instance for use with the Set-Cookie HTTP header.
+     * @throws TypeException
+     * @throws Exception
      */
     public function make(string $name, ?string $value = null, ?int $maxAge = null): SetCookieCollection
     {
@@ -61,9 +64,13 @@ class CookieFactory
     /**
      * Make an expired cookie instance.
      */
-    public function expire(string $name): SetCookieCollection
+    public function expire(string $name): SetCookieCollection|string
     {
-        return $this->make($name)->expire();
+        try {
+            return $this->make($name)->expire();
+        } catch (TypeException | Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**

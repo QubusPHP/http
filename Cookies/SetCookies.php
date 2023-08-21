@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace Qubus\Http\Cookies;
 
 use Psr\Http\Message\ResponseInterface;
-use Qubus\Http\Cookies\SetCookieCollection;
+use Qubus\Exception\Data\TypeException;
 
 use function array_map;
 use function array_values;
@@ -29,7 +29,7 @@ final class SetCookies
     public const SET_COOKIE_HEADER = 'Set-Cookie';
 
     /** @var SetCookieCollection[] */
-    private $setCookies = [];
+    private array $setCookies = [];
 
     /** @param SetCookieCollection[] $setCookies */
     public function __construct(array $setCookies = [])
@@ -86,9 +86,9 @@ final class SetCookies
      */
     public function renderIntoSetCookieHeader(ResponseInterface $response): ResponseInterface
     {
-        $response = $response->withoutHeader(static::SET_COOKIE_HEADER);
+        $response = $response->withoutHeader(self::SET_COOKIE_HEADER);
         foreach ($this->setCookies as $setCookie) {
-            $response = $response->withAddedHeader(static::SET_COOKIE_HEADER, (string) $setCookie);
+            $response = $response->withAddedHeader(self::SET_COOKIE_HEADER, (string) $setCookie);
         }
 
         return $response;
@@ -99,10 +99,11 @@ final class SetCookies
      *
      * @param string[] $setCookieStrings
      * @return static
+     * @throws TypeException
      */
     public static function fromSetCookieStrings(array $setCookieStrings): self
     {
-        return new static(
+        return new self(
             array_map(
                 fn (string $setCookieString): SetCookieCollection => SetCookieCollection::fromSetCookieString($setCookieString),
                 $setCookieStrings
@@ -115,10 +116,10 @@ final class SetCookies
      */
     public static function fromResponse(ResponseInterface $response): SetCookies
     {
-        return new static(
+        return new self(
             array_map(
                 fn (string $setCookieString): SetCookieCollection => SetCookieCollection::fromSetCookieString($setCookieString),
-                $response->getHeader(static::SET_COOKIE_HEADER)
+                $response->getHeader(self::SET_COOKIE_HEADER)
             )
         );
     }

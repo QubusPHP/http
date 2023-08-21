@@ -15,8 +15,6 @@ declare(strict_types=1);
 namespace Qubus\Http\Session;
 
 use Qubus\Http\Factories\RedirectResponseFactory;
-use Qubus\Http\Session\FlashAware;
-use Qubus\Http\Session\MessageType;
 
 use function array_key_exists;
 use function array_keys;
@@ -39,7 +37,7 @@ class Flash
     ];
 
     /** @var string $msgWrapper */
-    protected $msgWrapper = "<div class='%s'>%s</div>\n";
+    protected string $msgWrapper = "<div class='%s'>%s</div>\n";
 
     protected string $msgBefore = '';
 
@@ -55,7 +53,7 @@ class Flash
 
     protected string $msgCssClass = 'alert dismissable';
 
-    /** @var string $cssClassMap */
+    /** @var array $cssClassMap */
     protected array $cssClassMap = [
         MessageType::INFO    => 'alert-info center',
         MessageType::SUCCESS => 'alert-success center',
@@ -80,9 +78,10 @@ class Flash
     /**
      * Notice messages.
      *
+     * @param int $num
      * @return string
      */
-    public function notice(int $num)
+    public function notice(int $num): string
     {
         $msg[200] = '200 - Success: Ok';
         $msg[201] = '201 - Success: Created';
@@ -95,13 +94,13 @@ class Flash
     /**
      * Display the flash messages
      *
-     * @param  mixed   $types   (null)  print all of the message types
+     * @param mixed|null $types (null)  print all of the message types
      *                          (array)  print the given message types
      *                          (string)   print a single message type
-     * @param  bool $print   Whether to print the data or return it
-     * @return string
+     * @param bool $print Whether to print the data or return it
+     * @return bool|string
      */
-    public function display($types = null, bool $print = true)
+    public function display(mixed $types = null, bool $print = true): bool|string
     {
         if (! $this->session->has('flash')) {
             return false;
@@ -150,18 +149,18 @@ class Flash
      *
      * @return bool
      */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
-        return empty($this->session->get('flash')[MessageType::ERROR]) ? false : true;
+        return !empty($this->session->get('flash')[MessageType::ERROR]);
     }
 
     /**
      * See if there are any queued message
      *
-     * @param  string  $type  The $msgType
+     * @param string|null $type The $msgType
      * @return bool
      */
-    public function hasMessages(?string $type = null)
+    public function hasMessages(?string $type = null): bool
     {
         if (null !== $type) {
             if (! empty($this->session->get('flash')[$type])) {
@@ -180,11 +179,11 @@ class Flash
     /**
      * Format a message
      *
-     * @param  array  $msgDataArray   Array of message data
-     * @param  string $type           The $msgType
+     * @param array $msgDataArray   Array of message data
+     * @param string $type           The $msgType
      * @return string                 The formatted message
      */
-    protected function formatMessage($msgDataArray, $type)
+    protected function formatMessage(array $msgDataArray, string $type): string
     {
         $msgType = isset($this->msgTypes[$type]) ? $type : MessageType::DEFAULT;
         $cssClass = $this->msgCssClass . ' ' . $this->cssClassMap[$type];
@@ -212,9 +211,9 @@ class Flash
     /**
      * Redirect the user if a URL was given.
      *
-     * @return object
+     * @return Flash
      */
-    protected function doRedirect()
+    protected function doRedirect(): static
     {
         if ($this->redirectUrl) {
             RedirectResponseFactory::create($this->redirectUrl);
@@ -226,11 +225,11 @@ class Flash
     /**
      * Clear the messages from the session data
      *
-     * @param  mixed  $types  (array) Clear all of the message types in array
+     * @param mixed $types (array) Clear all of the message types in array
      *                        (string)  Only clear the one given message type
-     * @return object
+     * @return Flash
      */
-    protected function clear($types = [])
+    protected function clear(mixed $types = []): self
     {
         if ((is_array($types) && empty($types)) || null === $types || ! $types) {
             $this->session->unsetSession('flash');
@@ -252,9 +251,9 @@ class Flash
      *                           Note: Two placeholders (%s) are expected.
      *                           The first is the $msgCssClass,
      *                           The second is the message text.
-     * @return object
+     * @return Flash
      */
-    public function setMsgWrapper($msgWrapper = '')
+    public function setMsgWrapper(string $msgWrapper = ''): static
     {
         $this->msgWrapper = $msgWrapper;
         return $this;
@@ -264,9 +263,9 @@ class Flash
      * Prepend string to the message (inside of the message wrapper)
      *
      * @param string $msgBefore string to prepend to the message
-     * @return object
+     * @return Flash
      */
-    public function setMsgBefore($msgBefore = '')
+    public function setMsgBefore(string $msgBefore = ''): static
     {
         $this->msgBefore = $msgBefore;
         return $this;
@@ -276,9 +275,9 @@ class Flash
      * Append string to the message (inside of the message wrapper)
      *
      * @param string $msgAfter string to append to the message
-     * @return object
+     * @return Flash
      */
-    public function setMsgAfter($msgAfter = '')
+    public function setMsgAfter(string $msgAfter = ''): static
     {
         $this->msgAfter = $msgAfter;
         return $this;
@@ -287,10 +286,10 @@ class Flash
     /**
      * Set the HTML for the close button
      *
-     * @param string  $closeBtn  HTML to use for the close button
-     * @return object
+     * @param string $closeBtn  HTML to use for the close button
+     * @return Flash
      */
-    public function setCloseBtn($closeBtn = '')
+    public function setCloseBtn(string $closeBtn = ''): static
     {
         $this->closeBtn = $closeBtn;
         return $this;
@@ -299,10 +298,10 @@ class Flash
     /**
      * Set the CSS class for sticky notes
      *
-     * @param string  $stickyCssClass  the CSS class to use for sticky messages
-     * @return object
+     * @param string $stickyCssClass  the CSS class to use for sticky messages
+     * @return Flash
      */
-    public function setStickyCssClass($stickyCssClass = '')
+    public function setStickyCssClass(string $stickyCssClass = ''): static
     {
         $this->stickyCssClass = $stickyCssClass;
         return $this;
@@ -312,9 +311,9 @@ class Flash
      * Set the CSS class for messages
      *
      * @param string $msgCssClass The CSS class to use for messages
-     * @return object
+     * @return Flash
      */
-    public function setMsgCssClass($msgCssClass = '')
+    public function setMsgCssClass(string $msgCssClass = ''): static
     {
         $this->msgCssClass = $msgCssClass;
         return $this;
@@ -325,11 +324,11 @@ class Flash
      *
      * @param mixed  $msgType    (string) The message type
      *                           (array) key/value pairs for the class map
-     * @param mixed  $cssClass   (string) the CSS class to use
+     * @param mixed|null $cssClass   (string) the CSS class to use
      *                           (null) not used when $msgType is an array
-     * @return object
+     * @return Flash
      */
-    public function setCssClassMap($msgType, $cssClass = null)
+    public function setCssClassMap(mixed $msgType, mixed $cssClass = null): static
     {
         if (! is_array($msgType)) {
             // Make sure there's a CSS class set

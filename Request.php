@@ -14,8 +14,11 @@ declare(strict_types=1);
 
 namespace Qubus\Http;
 
+use InvalidArgumentException;
 use Laminas\Diactoros\Request as BaseRequest;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriInterface;
 use Qubus\Http\Exception\MalformedUrlException;
 use Qubus\Http\Input\Handler;
 
@@ -212,7 +215,7 @@ final class Request extends BaseRequest implements RequestInterface
     /**
      * Gets auth info accepted by the browser/client.
      *
-     * @return array
+     * @return array|null
      */
     public function getBasicAuth(): ?array
     {
@@ -255,9 +258,10 @@ final class Request extends BaseRequest implements RequestInterface
     /**
      * Gets most possible client IPv4 Address.
      *
+     * @param bool $trustForwardedHeader
      * @return bool|string
      */
-    public function getClientAddress(bool $trustForwardedHeader = false)
+    public function getClientAddress(bool $trustForwardedHeader = false): bool|string
     {
         $address = null;
 
@@ -340,7 +344,7 @@ final class Request extends BaseRequest implements RequestInterface
     }
 
     /**
-     * Gets variable from $_SERVER superglobal.
+     * Gets variable from $_SERVER super global.
      */
     public function getServer(string $name): ?string
     {
@@ -352,7 +356,7 @@ final class Request extends BaseRequest implements RequestInterface
     }
 
     /**
-     * Checks whether $_SERVER superglobal has certain index.
+     * Checks whether $_SERVER super global has certain index.
      */
     final public function hasServer(string $name): string
     {
@@ -525,7 +529,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isValidHttpMethod(string $method): bool
     {
-        return match(strtoupper($method)) {
+        return match (strtoupper($method)) {
             'GET','POST','PUT','DELETE','HEAD','OPTIONS',
             'PATCH','TRACE','CONNECT' => true,
             default => false,

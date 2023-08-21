@@ -24,12 +24,13 @@ trait FlashAware
     /**
      * Add an info message
      *
-     * @param  string  $message      The message text
-     * @param  string  $redirectUrl  Where to redirect once the message is added
-     * @param  bool $sticky       Sticky the message (hides the close button)
+     * @param string $message The message text
+     * @param string|null $redirectUrl Where to redirect once the message is added
+     * @param bool $sticky Sticky the message (hides the close button)
      * @return object
+     * @throws SessionException
      */
-    public function info(string $message, ?string $redirectUrl = null, bool $sticky = false)
+    public function info(string $message, ?string $redirectUrl = null, bool $sticky = false): object
     {
         return $this->add($message, MessageType::INFO, $redirectUrl, $sticky);
     }
@@ -37,12 +38,13 @@ trait FlashAware
     /**
      * Add a success message
      *
-     * @param  string  $message      The message text
-     * @param  string  $redirectUrl  Where to redirect once the message is added
-     * @param  bool $sticky       Sticky the message (hides the close button)
+     * @param string $message The message text
+     * @param string|null $redirectUrl Where to redirect once the message is added
+     * @param bool $sticky Sticky the message (hides the close button)
      * @return object
+     * @throws SessionException
      */
-    public function success(string $message, ?string $redirectUrl = null, bool $sticky = false)
+    public function success(string $message, ?string $redirectUrl = null, bool $sticky = false): object
     {
         return $this->add($message, MessageType::SUCCESS, $redirectUrl, $sticky);
     }
@@ -50,12 +52,13 @@ trait FlashAware
     /**
      * Add a warning message
      *
-     * @param  string  $message      The message text
-     * @param  string  $redirectUrl  Where to redirect once the message is added
-     * @param  bool $sticky       Sticky the message (hides the close button)
+     * @param string $message The message text
+     * @param string|null $redirectUrl Where to redirect once the message is added
+     * @param bool $sticky Sticky the message (hides the close button)
      * @return object
+     * @throws SessionException
      */
-    public function warning(string $message, ?string $redirectUrl = null, bool $sticky = false)
+    public function warning(string $message, ?string $redirectUrl = null, bool $sticky = false): object
     {
         return $this->add($message, MessageType::WARNING, $redirectUrl, $sticky);
     }
@@ -63,12 +66,13 @@ trait FlashAware
     /**
      * Add an error message
      *
-     * @param  string  $message      The message text
-     * @param  string  $redirectUrl  Where to redirect once the message is added
-     * @param  bool $sticky       Sticky the message (hides the close button)
+     * @param string $message The message text
+     * @param string|null $redirectUrl Where to redirect once the message is added
+     * @param bool $sticky Sticky the message (hides the close button)
      * @return object
+     * @throws SessionException
      */
-    public function error(string $message, ?string $redirectUrl = null, bool $sticky = false)
+    public function error(string $message, ?string $redirectUrl = null, bool $sticky = false): object
     {
         return $this->add($message, MessageType::ERROR, $redirectUrl, $sticky);
     }
@@ -76,12 +80,13 @@ trait FlashAware
     /**
      * Add a sticky message
      *
-     * @param  string  $message      The message text
-     * @param  string  $redirectUrl  Where to redirect once the message is added
-     * @param  string  $type         The $msgType
+     * @param string $message The message text
+     * @param string|null $redirectUrl Where to redirect once the message is added
+     * @param string $type The $msgType
      * @return object
+     * @throws SessionException
      */
-    public function sticky(string $message, ?string $redirectUrl = null, string $type = MessageType::DEFAULT)
+    public function sticky(string $message, ?string $redirectUrl = null, string $type = MessageType::DEFAULT): object
     {
         return $this->add($message, $type, $redirectUrl, true);
     }
@@ -89,18 +94,19 @@ trait FlashAware
     /**
      * Add a flash message to the session data
      *
-     * @param  string  $message      The message text
-     * @param  string  $type         The $msgType
-     * @param  string  $redirectUrl  Where to redirect once the message is added
-     * @param  bool $sticky       Whether or not the message is stickied
-     * @return object
+     * @param string $message The message text
+     * @param string $type The $msgType
+     * @param string|null $redirectUrl Where to redirect once the message is added
+     * @param bool $sticky Whether the message is stickied
+     * @return object|bool
+     * @throws SessionException
      */
     public function add(
         string $message,
         string $type = MessageType::DEFAULT,
         ?string $redirectUrl = null,
         bool $sticky = false
-    ) {
+    ): object|bool {
         // Make sure a message and valid type was passed
         if (! isset($message[0])) {
             return false;

@@ -42,7 +42,7 @@ class Message
         return $this->value;
     }
 
-    public static function fromString($value)
+    public static function fromString($value): Message
     {
         $nonce = substr($value, 0, 32);
         $hmac = substr($value, strrpos($value, '.') + 1);

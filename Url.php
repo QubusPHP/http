@@ -268,12 +268,14 @@ class Url extends Uri implements UriInterface, JsonSerializable
      */
     public function getParam(string $name, ?string $defaultValue): ?string
     {
-        return isset($this->getParams()[$name]) ?? $defaultValue;
+        return $this->getParams()[$name] ?? $defaultValue;
     }
 
     /**
      * UTF-8 aware parse_url() replacement.
      *
+     * @param string $url
+     * @param int $component
      * @return array
      * @throws MalformedUrlException
      */
@@ -298,6 +300,8 @@ class Url extends Uri implements UriInterface, JsonSerializable
      * Convert array to query-string params
      *
      * @param array $getParams
+     * @param bool $includeEmpty
+     * @return string
      */
     public static function arrayToParams(array $getParams = [], bool $includeEmpty = true): string
     {

@@ -26,6 +26,7 @@ interface SessionStorage
     /**
      * Read raw Session Data from underlying storage.
      *
+     * @param string $sessionId
      * @return array|null
      */
     public function read(string $sessionId): ?array;
@@ -33,8 +34,9 @@ interface SessionStorage
     /**
      * Write raw Session Data to underlying storage.
      *
-     * @param array  $data
-     * @param int    $ttl time to live (in seconds)
+     * @param string $sessionId
+     * @param array $data
+     * @param int $ttl time to live (in seconds)
      */
     public function write(string $sessionId, array $data, int $ttl): void;
 

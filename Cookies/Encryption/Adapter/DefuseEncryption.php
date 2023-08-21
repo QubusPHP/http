@@ -15,24 +15,33 @@ declare(strict_types=1);
 namespace Qubus\Http\Cookies\Encryption\Adapter;
 
 use Defuse\Crypto\Crypto;
+use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
+use Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException;
 use Defuse\Crypto\Key;
 use Qubus\Http\Cookies\Encryption\Encryption;
 
 class DefuseEncryption implements Encryption
 {
     /**
-     * @param string $key
+     * @param Key $key
      */
     public function __construct(public readonly Key $key)
     {
     }
 
-    public function decrypt($value)
+    /**
+     * @throws WrongKeyOrModifiedCiphertextException
+     * @throws EnvironmentIsBrokenException
+     */
+    public function decrypt($value): string
     {
         return Crypto::Decrypt($value, $this->key);
     }
 
-    public function encrypt($value)
+    /**
+     * @throws EnvironmentIsBrokenException
+     */
+    public function encrypt($value): string
     {
         return Crypto::Encrypt($value, $this->key);
     }

@@ -16,7 +16,6 @@ namespace Qubus\Http\Cookies;
 
 use Psr\Http\Message\ResponseInterface;
 use Qubus\Http\Cookies\Encryption\Encryptor;
-use Qubus\Http\Cookies\SetCookies;
 use Qubus\Http\Cookies\Validation\Validation;
 
 use function base64_encode;
