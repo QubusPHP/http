@@ -166,7 +166,7 @@ class File implements Item
      * @param string $name
      * @return static
      */
-    public function setFilename($name): Item
+    public function setFilename(string $name): Item
     {
         $this->filename = $name;
         return $this;
@@ -186,8 +186,9 @@ class File implements Item
      * Move the uploaded temporary file to it's new home
      *
      * @param string $destination
+     * @return bool
      */
-    public function move($destination): bool
+    public function move(string $destination): bool
     {
         return move_uploaded_file($this->tmpName, $destination);
     }
@@ -238,7 +239,7 @@ class File implements Item
      * @param string $name
      * @return static
      */
-    public function setTmpName($name): Item
+    public function setTmpName(string $name): Item
     {
         $this->tmpName = $name;
         return $this;

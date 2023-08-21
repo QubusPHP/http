@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace Qubus\Http\Cookies;
 
 use Psr\Http\Message\RequestInterface;
-use Qubus\Http\Cookies\CookieCollection;
 
 use function array_values;
 use function implode;
@@ -102,9 +101,7 @@ final class Cookies
     {
         $cookieString = implode('; ', $this->cookies);
 
-        $request = $request->withHeader(static::COOKIE_HEADER, $cookieString);
-
-        return $request;
+        return $request->withHeader(self::COOKIE_HEADER, $cookieString);
     }
 
     /**
@@ -112,7 +109,7 @@ final class Cookies
      */
     public static function fromCookieString(string $string): self
     {
-        return new static(CookieCollection::listFromCookieString($string));
+        return new self(CookieCollection::listFromCookieString($string));
     }
 
     /**
@@ -120,8 +117,8 @@ final class Cookies
      */
     public static function fromRequest(RequestInterface $request): Cookies
     {
-        $cookieString = $request->getHeaderLine(static::COOKIE_HEADER);
+        $cookieString = $request->getHeaderLine(self::COOKIE_HEADER);
 
-        return static::fromCookieString($cookieString);
+        return self::fromCookieString($cookieString);
     }
 }

@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Qubus\Http\Session;
 
+use Exception;
+
 use function assert;
 use function chr;
 use function ord;
@@ -25,6 +27,9 @@ use function vsprintf;
 
 class SessionId
 {
+    /**
+     * @throws Exception
+     */
     public static function create(?string $id = null): string
     {
         // Generate 36 bytes (288 bits) of random data or use the id passed into the function.

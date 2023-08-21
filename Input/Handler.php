@@ -104,7 +104,7 @@ class Handler
     }
 
     /**
-     * Rearrange multi-dimensional file object created by PHP.
+     * Rearrange multidimensional file object created by PHP.
      *
      * @param array      $index
      * @param array|null $original
@@ -173,10 +173,11 @@ class Handler
     /**
      * Find input object.
      *
+     * @param string $index
      * @param array ...$methods
-     * @return Input|array|null
+     * @return string|Input|array|File|null
      */
-    public function find(string $index, ...$methods)
+    public function find(string $index, ...$methods): string|Input|array|File|null
     {
         $element = null;
 
@@ -206,10 +207,12 @@ class Handler
     /**
      * Get input element value matching index
      *
+     * @param string $index
+     * @param string|null $defaultValue
      * @param array ...$methods
-     * @return string|array
+     * @return array|string|null
      */
-    public function value(string $index, ?string $defaultValue = null, ...$methods)
+    public function value(string $index, ?string $defaultValue = null, ...$methods): array|string|null
     {
         $input  = $this->find($index, ...$methods);
         $output = [];
@@ -238,9 +241,11 @@ class Handler
     /**
      * Find post-value by index or return default value.
      *
+     * @param string $index
+     * @param string|null $defaultValue
      * @return Input|array|string|null
      */
-    public function post(string $index, ?string $defaultValue = null)
+    public function post(string $index, ?string $defaultValue = null): Input|array|string|null
     {
         return $this->post[$index] ?? $defaultValue;
     }
@@ -248,9 +253,11 @@ class Handler
     /**
      * Find file by index or return default value.
      *
+     * @param string $index
+     * @param string|null $defaultValue
      * @return File|array|string|null
      */
-    public function file(string $index, ?string $defaultValue = null)
+    public function file(string $index, ?string $defaultValue = null): array|string|File|null
     {
         return $this->file[$index] ?? $defaultValue;
     }
@@ -258,9 +265,11 @@ class Handler
     /**
      * Find parameter/query-string by index or return default value.
      *
+     * @param string $index
+     * @param string|null $defaultValue
      * @return Input|array|string|null
      */
-    public function get(string $index, ?string $defaultValue = null)
+    public function get(string $index, ?string $defaultValue = null): Input|array|string|null
     {
         return $this->get[$index] ?? $defaultValue;
     }

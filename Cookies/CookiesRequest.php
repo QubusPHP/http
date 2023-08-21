@@ -17,8 +17,6 @@ namespace Qubus\Http\Cookies;
 
 use Psr\Http\Message\RequestInterface;
 use Qubus\Exception\Data\TypeException;
-use Qubus\Http\Cookies\CookieCollection;
-use Qubus\Http\Cookies\Cookies;
 
 use function is_callable;
 use function sprintf;
@@ -44,6 +42,9 @@ final class CookiesRequest
             ->renderIntoCookieHeader($request);
     }
 
+    /**
+     * @throws TypeException
+     */
     public static function modify(RequestInterface $request, string $name, callable $modify): RequestInterface
     {
         if (! is_callable($modify)) {
