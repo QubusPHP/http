@@ -13,7 +13,7 @@
     "authors": [
         {
             "name": "Joshua Parker",
-            "email": "josh@joshuaparker.blog"
+            "email": "joshua@joshuaparker.dev"
         }
     ],
     "require": {
@@ -28,7 +28,7 @@
         "qubus/cache": "^2.0",
         "qubus/config": "^2.0",
         "qubus/exception": "^2.0",
-        "qubus/support": "^2.2",
+        "qubus/support": "^2.3",
         "qubus/valueobjects": "^2.0"
     },
     "require-dev": {
