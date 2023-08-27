@@ -1,6 +1,6 @@
-.idea
-/config/
 /vendor/
+.idea
+Tests/Session/files/@psr*
 .phpcs-cache
 .phpunit.result.cache
 composer.lock

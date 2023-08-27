@@ -4,11 +4,9 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
- * @copyright  2016 Simon Sessingø (aka skipperbent) <simon.sessingoe@gmail.com>
+ * @copyright  2020
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.0.0
  */
 
 declare(strict_types=1);

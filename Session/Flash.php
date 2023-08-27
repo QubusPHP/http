@@ -4,10 +4,9 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2020
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.0.0
  */
 
 declare(strict_types=1);
@@ -65,6 +64,9 @@ class Flash
 
     public readonly string $msgId;
 
+    /**
+     * @throws SessionException
+     */
     public function __construct(public readonly PhpSession $session)
     {
         // Generate a unique ID for this user and session
@@ -142,6 +144,8 @@ class Flash
         } else {
             return $output;
         }
+
+        return false;
     }
 
     /**
@@ -272,7 +276,7 @@ class Flash
     }
 
     /**
-     * Append string to the message (inside of the message wrapper)
+     * Append string to the message (inside the message wrapper)
      *
      * @param string $msgAfter string to append to the message
      * @return Flash
