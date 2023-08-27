@@ -4,10 +4,9 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2020
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.0.0
  */
 
 declare(strict_types=1);
@@ -22,11 +21,11 @@ use function base64_decode;
 use function count;
 use function is_array;
 
-class RequestCookieDecryptor
+readonly class RequestCookieDecryptor
 {
     public function __construct(
-        public readonly Decryptor $decryptor,
-        public readonly Validation $validation,
+        public Decryptor $decryptor,
+        public Validation $validation,
     ) {
     }
 

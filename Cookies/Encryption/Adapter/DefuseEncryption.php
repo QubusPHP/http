@@ -4,10 +4,9 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020 Joshua Parker <josh@joshuaparker.blog>
+ * @copyright  2020
+ * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
- *
- * @since      1.0.0
  */
 
 declare(strict_types=1);
@@ -20,12 +19,12 @@ use Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException;
 use Defuse\Crypto\Key;
 use Qubus\Http\Cookies\Encryption\Encryption;
 
-class DefuseEncryption implements Encryption
+readonly class DefuseEncryption implements Encryption
 {
     /**
      * @param Key $key
      */
-    public function __construct(public readonly Key $key)
+    public function __construct(public Key $key)
     {
     }
 
