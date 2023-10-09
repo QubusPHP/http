@@ -28,7 +28,7 @@ use function call_user_func_array;
 class DelegateMock implements RequestHandlerInterface
 {
     /** @var Closure */
-    public $next;
+    public Closure $next;
 
     public function __construct(Closure $next)
     {
