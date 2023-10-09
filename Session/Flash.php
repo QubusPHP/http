@@ -69,6 +69,9 @@ class Flash
      */
     public function __construct(public readonly PhpSession $session)
     {
+        if (false === $this->session->isSessionActive()) {
+            $this->session->startSession();
+        }
         // Generate a unique ID for this user and session
         $this->msgId = sha1(uniqid());
         // Create session array to hold our messages if it doesn't already exist
