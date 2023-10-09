@@ -22,51 +22,47 @@ use Qubus\Http\Cookies\SetCookieCollection;
 use function Qubus\Support\Helpers\is_null__;
 use function time;
 
-class CookieFactory
+class CookieFactory implements HttpCookieFactory
 {
     public function __construct(protected ConfigContainer $config)
     {
     }
 
     /**
-     * Make a new cookie instance.
-     *
-     * This method returns a cookie instance for use with the Set-Cookie HTTP header.
-     * @throws TypeException
-     * @throws Exception
+     * @inheritDoc
      */
     public function make(string $name, ?string $value = null, ?int $maxAge = null): SetCookieCollection
     {
-        $cookie = SetCookieCollection::create($name, $value);
+        $cookie = SetCookieCollection::create(name: $name, value: $value);
 
         // Make sure we send both the MaxAge and Expires parameters (the former
         // is not supported by all browser versions)
         if ($maxAge) {
             $cookie = $cookie
-                ->withMaxAge($maxAge)
-                ->withExpires(time() + $maxAge);
+                ->withMaxAge(maxAge: $maxAge)
+                ->withExpires(expires: time() + $maxAge);
         }
 
-        if (! is_null__($this->domain())) {
-            $cookie = $cookie->withDomain($this->domain());
+        if (! is_null__(var: $this->domain())) {
+            $cookie = $cookie->withDomain(domain: $this->domain());
         }
 
         // Explicitly set SameSite value, use sensible default if no value provided.
-        $cookie = $cookie->withSameSite(SameSite::{$this->samesite()}());
+        $cookie = $cookie->withSameSite(sameSite: SameSite::{$this->samesite()}());
 
         return $cookie
-            ->withPath($this->path())
-            ->withSecure($this->secure())
-            ->withHttpOnly(true);
+            ->withPath(path: $this->path())
+            ->withSecure(secure: $this->secure())
+            ->withHttpOnly(httpOnly: true);
     }
 
     /**
-     * Make an expired cookie instance.
+     * @inheritDoc
      */
     public function expire(string $name): SetCookieCollection|string
     {
         try {
-            return $this->make($name)->expire();
+            return $this->make(name: $name)->expire();
         } catch (TypeException | Exception $e) {
             return $e->getMessage();
         }
@@ -79,7 +75,7 @@ class CookieFactory
      */
     public function path(): string|null
     {
-        return $this->config->getConfigKey('cookie.path', '/');
+        return $this->config->getConfigKey(key: 'cookies.path', default: '/');
     }
 
     /**
@@ -89,7 +85,7 @@ class CookieFactory
      */
     public function domain(): string
     {
-        return $this->config->getConfigKey('cookie.domain', '');
+        return $this->config->getConfigKey(key: 'cookies.domain', default: '');
     }
 
     /**
@@ -97,7 +93,7 @@ class CookieFactory
      */
     public function secure(): bool
     {
-        return $this->config->getConfigKey('cookie.secure', false);
+        return $this->config->getConfigKey(key: 'cookies.secure', default: false);
     }
 
     /**
@@ -107,7 +103,7 @@ class CookieFactory
      */
     public function samesite(): string
     {
-        return $this->config->getConfigKey('cookie.samesite', 'lax');
+        return $this->config->getConfigKey(key: 'cookies.samesite', default: 'lax');
     }
 
     public function config(): ConfigContainer

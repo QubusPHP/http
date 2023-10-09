@@ -22,7 +22,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Qubus\Exception\Data\TypeException;
 use Qubus\Exception\Exception;
 use Qubus\Http\Cookies\CookiesResponse;
-use Qubus\Http\Cookies\Factory\CookieFactory;
+use Qubus\Http\Cookies\Factory\HttpCookieFactory;
 use Qubus\Http\Session\ClientSessionId;
 use Qubus\Http\Session\HttpSession;
 use Qubus\Http\Session\SessionData;
@@ -41,7 +41,7 @@ final class SessionMiddleware implements MiddlewareInterface
     private array $options;
 
     public function __construct(
-        private readonly CookieFactory $cookie,
+        private readonly HttpCookieFactory $cookie,
         private readonly SessionStorage $storage,
     ) {
     }
@@ -75,14 +75,14 @@ final class SessionMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $session = $this->makeSession($request);
+        $session = $this->makeSession(request: $request);
 
         $request = $request
             ->withAttribute($this->options['attribute'] ?? self::SESSION_ATTRIBUTE, $session);
 
         $response = $handler->handle($request);
 
-        return $this->commitSession($response, $session);
+        return $this->commitSession(response: $response, session: $session);
     }
 
     /**
@@ -100,17 +100,17 @@ final class SessionMiddleware implements MiddlewareInterface
 
             $pattern = '/' . Validatable::VALID_PATTERN . '/';
 
-            if (preg_match($pattern, $clientSessionId)) {
-                $sessionId = SessionId::create($clientSessionId);
+            if (preg_match(pattern: $pattern, subject: $clientSessionId)) {
+                $sessionId = SessionId::create(id: $clientSessionId);
 
-                $data = $this->storage->read($sessionId);
+                $data = $this->storage->read(sessionId: $sessionId);
 
-                if (is_array($data)) {
-                    return SessionData::create($clientSessionId, $data, false);
+                if (is_array(value: $data)) {
+                    return SessionData::create(clientSessionId: $clientSessionId, data: $data, isNew: false);
                 }
             }
         }
-        return SessionData::create(ClientSessionId::create(), [], true);
+        return SessionData::create(clientSessionId: ClientSessionId::create(), data: [], isNew: true);
     }
 
     /**
@@ -126,18 +126,18 @@ final class SessionMiddleware implements MiddlewareInterface
 
         if ($session->isRenewed()) {
             // The session was renewed - destroy the data that was stored under the old Session ID:
-            $this->storage->destroy($session->oldSessionId());
+            $this->storage->destroy(sessionId: $session->oldSessionId());
         }
 
         if (count($data) === 0) {
             // The session is empty - it should not be stored.
             if (! $session->isNew()) {
                 // This session contained data previously and became empty - it should be destroyed:
-                $this->storage->destroy($session->sessionId());
+                $this->storage->destroy(sessionId: $session->sessionId());
                 // The cookie should be expired immediately:
                 $response = CookiesResponse::set(
-                    $response,
-                    $this->cookie->make('', '', 0)
+                    response: $response,
+                    setCookieCollection: $this->cookie->make(name: '', value: '', maxAge: 0)
                 );
             }
         } else {
@@ -147,11 +147,11 @@ final class SessionMiddleware implements MiddlewareInterface
             if ($session->isNew() || $session->isRenewed()) {
                 // We've stored a new (or renewed) session - issue a cookie with the new Session ID:
                 $response = CookiesResponse::set(
-                    $response,
-                    $this->cookie->make(
-                        $this->options['name'] ?? $session::COOKIE_NAME,
-                        $session->clientSessionId(),
-                        $this->getSessionLifetimeInSeconds()
+                    response: $response,
+                    setCookieCollection: $this->cookie->make(
+                        name: $this->options['name'] ?? $session::COOKIE_NAME,
+                        value: $session->clientSessionId(),
+                        maxAge: $this->getSessionLifetimeInSeconds()
                     )
                 );
             }
@@ -165,6 +165,6 @@ final class SessionMiddleware implements MiddlewareInterface
      */
     private function getSessionLifetimeInSeconds(): int
     {
-        return $this->cookie->config()->getConfigKey('cookies.lifetime', $this->options['lifetime']);
+        return $this->cookie->config()->getConfigKey(key: 'cookies.lifetime', default: $this->options['lifetime']);
     }
 }
