@@ -38,7 +38,7 @@ final class SessionMiddleware implements MiddlewareInterface
 {
     private const SESSION_ATTRIBUTE = 'session';
 
-    private array $options;
+    private array $options = [];
 
     public function __construct(
         private readonly HttpCookieFactory $cookie,
@@ -95,7 +95,7 @@ final class SessionMiddleware implements MiddlewareInterface
     {
         $cookies = $request->getCookieParams();
 
-        if (isset($cookies[$this->options['name']])) {
+        if (isset($this->options['name']) && isset($cookies[$this->options['name']])) {
             $clientSessionId = $cookies[$this->options['name']];
 
             $pattern = '/' . Validatable::VALID_PATTERN . '/';
