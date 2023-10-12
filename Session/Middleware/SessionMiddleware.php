@@ -94,9 +94,10 @@ final class SessionMiddleware implements MiddlewareInterface
     private function makeSession(ServerRequestInterface $request): HttpSession
     {
         $cookies = $request->getCookieParams();
+        $cookieName = $this->options['name'] ?? HttpSession::COOKIE_NAME;
 
-        if (isset($this->options['name']) && isset($cookies[$this->options['name']])) {
-            $clientSessionId = $cookies[$this->options['name']];
+        if (isset($cookieName) && isset($cookies[$cookieName])) {
+            $clientSessionId = $cookies[$cookieName];
 
             $pattern = '/' . Validatable::VALID_PATTERN . '/';
 
