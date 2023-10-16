@@ -36,7 +36,7 @@ class SessionDataTest extends TestCase
     {
         $this->clientSessionId = ClientSessionId::create();
         $this->sessionId = SessionId::create($this->clientSessionId);
-        $this->session = SessionData::create($this->clientSessionId, [], true);
+        $this->session = new SessionData($this->clientSessionId, [], true);
     }
 
     public function testClientSessionAndSessionId()
@@ -64,7 +64,7 @@ class SessionDataTest extends TestCase
 
         $data = $this->session->getData();
 
-        $session = SessionData::create($this->clientSessionId, $data, false);
+        $session = new SessionData($this->clientSessionId, $data, false);
 
         Assert::assertEquals($model, $this->session->get(UserSession::class), 'it restores the entity instance from data');
         Assert::assertSame($model->userId(), $this->session->get(UserSession::class)->userId(), 'it preserves the entity state');
