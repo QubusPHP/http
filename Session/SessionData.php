@@ -4,7 +4,7 @@
  * Qubus\Http
  *
  * @link       https://github.com/QubusPHP/http
- * @copyright  2020
+ * @copyright  2023
  * @author     Joshua Parker <joshua@joshuaparker.dev>
  * @license    https://opensource.org/licenses/mit-license.php MIT License
  */
@@ -15,7 +15,6 @@ namespace Qubus\Http\Session;
 
 use Exception;
 use Qubus\Exception\Data\TypeException;
-use Qubus\Support\Serializer\JsonSerializer;
 use ReflectionClass;
 use ReflectionException;
 
@@ -32,17 +31,12 @@ final class SessionData implements HttpSession
     /** @var SessionEntity[] */
     private array $objects = [];
 
-    private function __construct(
+    public function __construct(
         /** @var string client session id. */
         private string $clientSessionId,
         private array $data,
         private bool $isNew = false,
     ) {
-    }
-
-    public static function create(string $clientSessionId, array $data, bool $isNew = false): self
-    {
-        return new self($clientSessionId, $data, $isNew);
     }
 
     /**
@@ -76,7 +70,7 @@ final class SessionData implements HttpSession
             if ($object->isEmpty()) {
                 unset($data[$type]);
             } else {
-                $data[$type] = [$this->checksum($type), (new JsonSerializer())->serialize($object)];
+                $data[$type] = [$this->checksum($type), serialize($object)];
             }
         }
 
@@ -98,7 +92,7 @@ final class SessionData implements HttpSession
                 [$checksum, $serialized] = $this->data[$type];
 
                 $this->objects[$type] = $checksum === $this->checksum($type)
-                ? (new JsonSerializer())->unserialize($serialized)
+                ? unserialize($serialized)
                 : new $type();
             } else {
                 $this->objects[$type] = new $type();

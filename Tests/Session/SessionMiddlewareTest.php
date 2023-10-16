@@ -31,6 +31,7 @@ use Qubus\Http\Response;
 use Qubus\Http\ServerRequest;
 use Qubus\Http\Session\HttpSession;
 use Qubus\Http\Session\Middleware\SessionMiddleware;
+use Qubus\Http\Session\SessionService;
 use Qubus\Http\Session\Storage\SessionStorage;
 use Qubus\Http\Session\Storage\SimpleCacheStorage;
 use Qubus\Tests\Http\Session\Entity\UserSession;
@@ -57,8 +58,7 @@ class SessionMiddlewareTest extends TestCase
 
         $this->storage = new SimpleCacheStorage(new FileSystemCache($filesystem, 160));
         $this->cookie = new CookieFactory($config);
-        $this->middleware = (new SessionMiddleware($this->cookie, $this->storage))
-            ->withOptions(['name' => 'TESTSESSID', 'attribute' => 'phpunit', 'lifetime' => 160]);
+        $this->middleware = new SessionMiddleware(new SessionService($this->storage, new CookieFactory($config)));
     }
 
     public function testGenerateSessionEntity()
@@ -66,7 +66,7 @@ class SessionMiddlewareTest extends TestCase
         $userEntity = null;
 
         $delegate = new DelegateMock(function (ServerRequestInterface $request) use (&$userEntity) {
-            $session = $request->getAttribute('phpunit');
+            $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
 
             Assert::assertInstanceOf(
                 HttpSession::class,
@@ -90,7 +90,7 @@ class SessionMiddlewareTest extends TestCase
 
         $delegate->next = function (ServerRequestInterface $request) use ($userEntity) {
             /** @var HttpSession $session */
-            $session = $request->getAttribute('phpunit');
+            $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
 
             Assert::assertEquals($userEntity, $session->get(UserSession::class), 'Session entities are available in next request with the cookie returned in the previous.');
 
