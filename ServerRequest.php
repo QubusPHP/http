@@ -43,4 +43,9 @@ final class ServerRequest extends BaseServerRequest implements ServerRequestInte
             $protocol
         );
     }
+
+    public function get(mixed $name): mixed
+    {
+        return $this->getParsedBody()[$name];
+    }
 }
