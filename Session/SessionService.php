@@ -24,26 +24,14 @@ use Qubus\Http\Session\Storage\SessionStorage;
 
 final class SessionService
 {
-    public const TWO_WEEKS = 1209600;
-
-    public const ONE_YEAR = 31536000;
-
     public const COOKIE_NAME = "QSESSID";
 
-    public array $options = [];
+    public static array $options = [];
 
     public function __construct(
         public readonly SessionStorage $sessionStorage,
         public readonly HttpCookieFactory $cookie,
-        int $ttl = self::TWO_WEEKS
     ) {
-    }
-
-    public function withName(string $name): self
-    {
-        $this->options['name'] = $name;
-
-        return $this;
     }
 
     /**
@@ -55,7 +43,7 @@ final class SessionService
     {
         $cookies = $request->getCookieParams();
 
-        $cookieName = $this->options['name'] ?? self::COOKIE_NAME;
+        $cookieName = self::$options['cookie-name'] ?? self::COOKIE_NAME;
 
         if (isset($cookieName) && isset($cookies[$cookieName])) {
             $clientSessionId = $cookies[$cookieName];
@@ -112,7 +100,7 @@ final class SessionService
                 $response = CookiesResponse::set(
                     response: $response,
                     setCookieCollection: $this->cookie->make(
-                        name: $this->options['name'] ?? self::COOKIE_NAME,
+                        name: self::$options['cookie-name'] ?? self::COOKIE_NAME,
                         value: $session->clientSessionId(),
                         maxAge: $this->getSessionLifetimeInSeconds()
                     )
@@ -130,7 +118,7 @@ final class SessionService
     {
         return $this->cookie->config()->getConfigKey(
             key: 'cookies.lifetime',
-            default: $this->options['lifetime'] ?? 3600
+            default: self::$options['cookie-lifetime'] ?? 3600
         );
     }
 }
