@@ -44,7 +44,8 @@ final class SessionMiddleware implements MiddlewareInterface
         $session = $this->sessionService->makeSession(request: $request);
 
         $request = $request
-            ->withAttribute(self::SESSION_ATTRIBUTE, $session);
+            ->withAttribute(self::SESSION_ATTRIBUTE, $session->clientSessionId())
+            ->withHeader('X-Session-Id', $session->clientSessionId());
 
         $response = $handler->handle($request);
 

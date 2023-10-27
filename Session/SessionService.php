@@ -22,7 +22,7 @@ use Qubus\Http\Cookies\CookiesResponse;
 use Qubus\Http\Cookies\Factory\HttpCookieFactory;
 use Qubus\Http\Session\Storage\SessionStorage;
 
-final class SessionService
+class SessionService
 {
     public const COOKIE_NAME = "QSESSID";
 
