@@ -116,9 +116,9 @@ final class SessionService
      */
     private function getSessionLifetimeInSeconds(): int
     {
-        return $this->cookie->config()->getConfigKey(
+        return self::$options['cookie-lifetime'] ?? $this->cookie->config()->getConfigKey(
             key: 'cookies.lifetime',
-            default: self::$options['cookie-lifetime'] ?? 3600
+            default: 3600
         );
     }
 }
