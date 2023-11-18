@@ -62,7 +62,9 @@ class NativeSession implements PhpSession
 
         $this->sessionId($sessionId);
 
-        session_set_save_handler($handler, true);
+        if (!$this->isSessionActive()) {
+            session_set_save_handler($handler, true);
+        }
     }
 
     /**
