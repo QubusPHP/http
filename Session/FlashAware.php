@@ -120,7 +120,6 @@ trait FlashAware
         // Add the message to the session data
         if (! array_key_exists($type, $this->session->get('flash'))) {
             $_SESSION['flash'][$type] = [];
-            $this->session->set('flash')[$type] = [];
         }
         $_SESSION['flash'][$type][] = ['sticky' => $sticky, 'message' => $message];
 
