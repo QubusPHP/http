@@ -36,21 +36,20 @@ class Flash
     ];
 
     /** @var string $msgWrapper */
-    protected string $msgWrapper = "<div class='%s'>%s</div>\n";
+    protected string $msgWrapper = "<div class='%s' role='alert'>%s</div>\n";
 
     protected string $msgBefore = '';
 
     protected string $msgAfter = '';
 
-    protected string $closeBtn = '<button type="button" class="close"
-                                data-dismiss="alert"
-                                aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>';
+    protected string $closeBtn = '<button type="button" class="btn-close"
+                                    data-dismiss="alert"
+                                    aria-label="Close">
+                                </button>';
 
     protected string $stickyCssClass = 'sticky';
 
-    protected string $msgCssClass = 'alert dismissable';
+    protected string $msgCssClass = 'alert-dismissible fade show';
 
     /** @var array $cssClassMap */
     protected array $cssClassMap = [
@@ -117,7 +116,7 @@ class Flash
         if (null === $types || ! $types || (is_array($types) && empty($types))) {
             $types = array_keys($this->msgTypes);
 
-        // Print multiple message types (as defined by an array)
+            // Print multiple message types (as defined by an array)
         } elseif (is_array($types) && ! empty($types)) {
             $theTypes = $types;
             $types = [];
@@ -200,7 +199,7 @@ class Flash
         if ($msgDataArray['sticky']) {
             $cssClass .= ' ' . $this->stickyCssClass;
 
-        // If it's not sticky then add the close button
+            // If it's not sticky then add the close button
         } else {
             $msgBefore = $this->closeBtn . $msgBefore;
         }
