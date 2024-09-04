@@ -49,7 +49,7 @@ class Flash
 
     protected string $stickyCssClass = 'sticky';
 
-    protected string $msgCssClass = 'alert-dismissible fade show';
+    protected string $msgCssClass = 'alert alert-dismissible fade show';
 
     /** @var array $cssClassMap */
     protected array $cssClassMap = [
