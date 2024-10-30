@@ -88,7 +88,7 @@ class SessionService
                 // The cookie should be expired immediately:
                 $response = CookiesResponse::set(
                     response: $response,
-                    setCookieCollection: $this->cookie->make(name: '', value: '', maxAge: 0)
+                    setCookieCollection: $this->cookie->make(name: self::$options['cookie-name'] ?? self::COOKIE_NAME, value: '', maxAge: 0)
                 );
             }
         } else {
