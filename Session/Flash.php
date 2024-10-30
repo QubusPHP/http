@@ -42,14 +42,14 @@ class Flash
 
     protected string $msgAfter = '';
 
-    protected string $closeBtn = '<button type="button" class="btn-close"
+    protected string $closeBtn = '<button type="button" class="btn-close close"
                                     data-dismiss="alert"
                                     aria-label="Close">
                                 </button>';
 
     protected string $stickyCssClass = 'sticky';
 
-    protected string $msgCssClass = 'alert alert-dismissible fade show';
+    protected string $msgCssClass = 'alert alert-dismissible show';
 
     /** @var array $cssClassMap */
     protected array $cssClassMap = [
