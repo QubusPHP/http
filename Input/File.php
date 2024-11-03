@@ -27,7 +27,7 @@ use const PATHINFO_EXTENSION;
 
 class File implements Item
 {
-    public string $index;
+    public string|int $index;
     public string $name;
     public string $filename;
     public int $size;
@@ -35,9 +35,9 @@ class File implements Item
     public int $errors;
     public string $tmpName;
 
-    public function __construct(string $index)
+    public function __construct(string|int $index)
     {
-        $this->index  = $index;
+        $this->index  = (string) $index;
         $this->errors = 0;
         // Make the name human friendly, by replace _ with space
         $this->name = ucfirst(str_replace('_', ' ', strtolower($this->index)));
@@ -64,7 +64,7 @@ class File implements Item
             'error'    => null,
         ];
 
-        $values = array_merge($values, $extended);
+        $values = array_merge($extended, $values);
 
         return (new static($values['index']))
             ->setSize((int) $values['size'])

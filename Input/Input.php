@@ -19,15 +19,15 @@ use function ucfirst;
 
 class Input implements Item
 {
-    public string $index;
+    public string|int|null $index = null;
 
     public ?string $name = null;
 
-    public string $value;
+    public ?string $value = null;
 
-    public function __construct(string $index, ?string $value = null)
+    public function __construct(string|int $index, ?string $value = null)
     {
-        $this->index = $index;
+        $this->index = (string) $index;
         $this->value = $value;
         // Make the name human friendly, by replace _ with space
         $this->name = ucfirst(str_replace('_', ' ', strtolower($this->index)));
