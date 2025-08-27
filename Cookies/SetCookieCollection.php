@@ -136,7 +136,7 @@ final class SetCookieCollection
      * @param DateTimeInterface|int|string|null $expires
      * @throws TypeException
      */
-    private function resolveExpires(DateTimeInterface|int|string $expires = null): int
+    private function resolveExpires(DateTimeInterface|int|string|null $expires = null): int
     {
         if ($expires === null) {
             return 0;
@@ -170,7 +170,7 @@ final class SetCookieCollection
      * @param DateTimeInterface|int|string|null $expires
      * @throws TypeException
      */
-    public function withExpires(DateTimeInterface|int|string $expires = null): self
+    public function withExpires(DateTimeInterface|int|string|null $expires = null): self
     {
         $expires = $this->resolveExpires($expires);
 
@@ -330,7 +330,6 @@ final class SetCookieCollection
 
         [$cookieName, $cookieValue] = Util::splitCookiePair($rawAttribute);
 
-        /** @var SetCookieCollection $setCookie */
         $setCookie = new self($cookieName);
 
         if ($cookieValue !== null) {

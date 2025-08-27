@@ -96,7 +96,6 @@ final class CookieCollection
     {
         [$cookieName, $cookieValue] = Util::splitCookiePair($string);
 
-        /** @var CookieCollection $cookie */
         $cookie = new self($cookieName);
 
         if ($cookieValue !== null) {

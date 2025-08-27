@@ -28,7 +28,7 @@ class Validation
     public readonly string $key;
     public readonly string $algo;
 
-    public function __construct($key, $algo = null)
+    public function __construct(string $key, ?string $algo = null)
     {
         $this->key = $key;
         $this->algo = $algo ?: static::DEFAULT_ALGO;
