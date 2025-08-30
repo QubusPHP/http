@@ -17,21 +17,28 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Http\Session;
 
+use Exception;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Qubus\Exception\Data\TypeException;
 use Qubus\Http\Session\ClientSessionId;
 use Qubus\Http\Session\HttpSession;
 use Qubus\Http\Session\SessionData;
 use Qubus\Http\Session\SessionId;
 use Qubus\Tests\Http\Session\Entity\UserSession;
+use ReflectionException;
 
 class SessionDataTest extends TestCase
 {
-    protected const USER_ID = '72f61cf4-5a84-4c7a-837d-fcadc9665471';
+    protected const string USER_ID = '72f61cf4-5a84-4c7a-837d-fcadc9665471';
     protected string $clientSessionId;
     protected string $sessionId;
     protected HttpSession $session;
 
+    /**
+     * @throws TypeException
+     * @throws Exception
+     */
     public function setUp(): void
     {
         $this->clientSessionId = ClientSessionId::create();
@@ -39,12 +46,19 @@ class SessionDataTest extends TestCase
         $this->session = new SessionData($this->clientSessionId, [], true);
     }
 
+    /**
+     * @throws Exception
+     */
     public function testClientSessionAndSessionId()
     {
         Assert::assertSame($this->clientSessionId, $this->session->clientSessionId());
         Assert::assertSame($this->sessionId, $this->session->sessionId());
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws TypeException
+     */
     public function testInstanceOfSessionEntity()
     {
         $model = $this->session->get(UserSession::class);
@@ -57,6 +71,11 @@ class SessionDataTest extends TestCase
         Assert::assertSame($model, $this->session->get(UserSession::class), 'it returns the same instance every time');
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws TypeException
+     * @throws Exception
+     */
     public function testDataCanBeReturnedAndCleared()
     {
         $model = $this->session->get(UserSession::class);

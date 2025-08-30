@@ -66,7 +66,7 @@ class CookieCollectionTest extends TestCase
     }
 
     /** @return string[][] */
-    public function provideParsesOneFromCookieStringData(): array
+    public static function provideParsesOneFromCookieStringData(): array
     {
         return [
             ['someCookie=something', 'someCookie', 'something'],
@@ -76,7 +76,7 @@ class CookieCollectionTest extends TestCase
     }
 
     /** @return string[][]|string[][][][] */
-    public function provideParsesListFromCookieString(): array
+    public static function provideParsesListFromCookieString(): array
     {
         return [
             [

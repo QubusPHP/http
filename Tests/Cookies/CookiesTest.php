@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Qubus\Tests\Http\Cookies;
 
 use PHPUnit\Framework\TestCase;
+use Qubus\Exception\Data\TypeException;
 use Qubus\Http\Cookies\CookieCollection;
 use Qubus\Http\Cookies\Cookies;
 use Qubus\Http\Cookies\CookiesRequest;
@@ -31,11 +32,12 @@ class CookiesTest extends TestCase
 {
     /**
      * @test
+     * @throws TypeException
      */
     public function testEncryptsAndDecryptsCookies(): void
     {
         // Simulate a request coming in with several cookies.
-        $request = (new CookieRequestTesting())
+        $request = new CookieRequestTesting()
             ->withHeader(Cookies::COOKIE_HEADER, 'theme=light; sessionToken=RAPELCGRQ; hello=world');
 
         // "Before" Middleware Example
@@ -78,7 +80,7 @@ class CookiesTest extends TestCase
             }
         );
 
-        // Even though the sessionToken intiially went out "decrypted", at this point (and at any point
+        // Even though the sessionToken initially went out "decrypted", at this point (and at any point
         // in the future) the sessionToken cookie will remain "encrypted."
         self::assertEquals(
             ['theme=light', 'sessionToken=RAPELCGRQ', 'hello=world'],

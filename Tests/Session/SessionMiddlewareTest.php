@@ -24,6 +24,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Qubus\Cache\FileSystemCache;
 use Qubus\Config\Collection;
+use Qubus\Exception\Data\TypeException;
+use Qubus\Exception\Exception;
 use Qubus\FileSystem\Adapter\LocalFlysystemAdapter;
 use Qubus\FileSystem\FileSystem;
 use Qubus\Http\Cookies\Factory\CookieFactory;
@@ -42,15 +44,18 @@ use function mb_substr;
 
 class SessionMiddlewareTest extends TestCase
 {
-    protected const USER_ID = '72f61cf4-5a84-4c7a-837d-fcadc9665471';
+    protected const string USER_ID = '72f61cf4-5a84-4c7a-837d-fcadc9665471';
     protected SessionStorage $storage;
     protected CookieFactory $cookie;
     protected MiddlewareInterface $middleware;
 
-    public function setUp(): void
+    /**
+     * @throws Exception
+     */
+    protected function setUp(): void
     {
         $config = Collection::factory([
-            'path' => __DIR__ . '/config',
+            'path' => __DIR__ . '/../config',
         ]);
 
         $localAdapter = new LocalFlysystemAdapter($config);
@@ -61,6 +66,10 @@ class SessionMiddlewareTest extends TestCase
         $this->middleware = new SessionMiddleware(new SessionService($this->storage, new CookieFactory($config)));
     }
 
+    /**
+     * @throws TypeException
+     * @throws Exception
+     */
     public function testGenerateSessionEntity()
     {
         $userEntity = null;
@@ -92,17 +101,21 @@ class SessionMiddlewareTest extends TestCase
             /** @var HttpSession $session */
             $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
 
-            Assert::assertEquals($userEntity, $session->get(UserSession::class), 'Session entities are available in next request with the cookie returned in the previous.');
+            Assert::assertEquals(
+                $userEntity,
+                $session->get(UserSession::class),
+                'Session entities are available in next request with the cookie returned in the previous.'
+            );
 
             return new Response();
         };
 
-        $requestTwo = (new ServerRequest())->withCookieParams($cookies);
+        $requestTwo = new ServerRequest()->withCookieParams($cookies);
 
         $this->middleware->process($requestTwo, $delegate);
     }
 
-    private function getCookies(ResponseInterface $response)
+    private function getCookies(ResponseInterface $response): array
     {
         $cookieHeaders = $response->getHeader("Set-Cookie");
 

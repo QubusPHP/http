@@ -17,9 +17,11 @@ namespace Qubus\Tests\Http\Cookies;
 
 use Carbon\CarbonImmutable;
 use PHPUnit\Framework\TestCase;
+use Qubus\Exception\Data\TypeException;
 use Qubus\Http\Cookies\SameSite;
 use Qubus\Http\Cookies\SetCookieCollection;
 use Qubus\ValueObjects\DateTime\DateTime;
+use Qubus\ValueObjects\DateTime\Exception\InvalidDateException;
 
 use function time;
 
@@ -28,6 +30,7 @@ class SetCookieCollectionTest extends TestCase
     /**
      * @test
      * @dataProvider provideParsesFromSetCookieStringData
+     * @throws TypeException
      */
     public function testParsesFromSetCookieString(string $cookieString, SetCookieCollection $expectedSetCookie): void
     {
@@ -37,8 +40,11 @@ class SetCookieCollectionTest extends TestCase
         self::assertEquals($cookieString, (string) $setCookie);
     }
 
-    /** @return string[][]|SetCookie[][] */
-    public function provideParsesFromSetCookieStringData(): array
+    /**
+     * @return string[][]|SetCookieCollection[][]
+     * @throws TypeException
+     */
+    public static function provideParsesFromSetCookieStringData(): array
     {
         return [
             [
@@ -159,6 +165,7 @@ class SetCookieCollectionTest extends TestCase
 
     /**
      * @test
+     * @throws TypeException
      */
     public function testExpiresCookies(): void
     {
@@ -169,6 +176,8 @@ class SetCookieCollectionTest extends TestCase
 
     /**
      * @test
+     * @throws TypeException
+     * @throws InvalidDateException
      */
     public function testCreatesLongLivingCookies(): void
     {
@@ -202,10 +211,11 @@ class SetCookieCollectionTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Qubus\Exception\Data\TypeException
      */
     public function testInvalidExpiresFormatWillBeRejected(): void
     {
+        $this->expectException(\Qubus\Exception\Data\TypeException::class);
+
         $setCookie = SetCookieCollection::create('foo', 'bar');
 
         $this->expectExceptionMessage('Invalid expires "potato" provided.');
@@ -215,10 +225,10 @@ class SetCookieCollectionTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Qubus\Exception\Data\TypeException
      */
     public function testEmptyCookieIsRejected(): void
     {
+        $this->expectException(\Qubus\Exception\Data\TypeException::class);
         $this->expectExceptionMessage('The provided cookie string "" must have at least one attribute.');
 
         SetCookieCollection::fromSetCookieString('');

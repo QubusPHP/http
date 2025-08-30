@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Qubus\Tests\Http\Cookies\Encryption\Adapter;
 
 use Defuse\Crypto\Crypto;
+use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
+use Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException;
 use Defuse\Crypto\Key;
 use PHPUnit\Framework\TestCase;
 use Qubus\Http\Cookies\Encryption\Adapter\DefuseEncryption;
@@ -31,6 +33,10 @@ class DefuseEncryptionTest extends TestCase
         }
     }
 
+    /**
+     * @throws EnvironmentIsBrokenException
+     * @throws WrongKeyOrModifiedCiphertextException
+     */
     public function testEncryptAndDecrypt()
     {
         $encryption = new DefuseEncryption(Key::createNewRandomKey());

@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Qubus\Tests\Http\Cookies;
 
 use PHPUnit\Framework\TestCase;
+use Qubus\Exception\Data\TypeException;
 use Qubus\Http\Cookies\CookiesResponse;
 use Qubus\Http\Cookies\SetCookieCollection;
 use Qubus\Http\Cookies\SetCookies;
@@ -65,6 +66,7 @@ class CookiesResponseTest extends TestCase
 
     /**
      * @test
+     * @throws TypeException
      */
     public function testModifiesCookies(): void
     {

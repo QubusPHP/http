@@ -23,7 +23,7 @@ use function implode;
 trait CookieMessageTesting
 {
     /** @var string[] */
-    private $headers = [];
+    private array $headers = [];
 
     /** {@inheritDoc} */
     public function getProtocolVersion(): void

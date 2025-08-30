@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Qubus\Tests\Http\Cookies;
 
 use PHPUnit\Framework\TestCase;
+use Qubus\Exception\Data\TypeException;
 use Qubus\Http\Cookies\CookieCollection;
 use Qubus\Http\Cookies\Cookies;
 use Qubus\Http\Cookies\CookiesRequest;
@@ -30,7 +31,7 @@ class CookiesRequestTest extends TestCase
      */
     public function testGetsCookies(): void
     {
-        $request = (new CookieRequestTesting())
+        $request = new CookieRequestTesting()
             ->withHeader(Cookies::COOKIE_HEADER, 'theme=light; sessionToken=RAPELCGRQ; hello=world');
 
         self::assertEquals(
@@ -44,7 +45,7 @@ class CookiesRequestTest extends TestCase
      */
     public function testSetsCookies(): void
     {
-        $request = (new CookieRequestTesting())
+        $request = new CookieRequestTesting()
             ->withHeader(Cookies::COOKIE_HEADER, 'theme=light; sessionToken=RAPELCGRQ; hello=world');
 
         $request = CookiesRequest::set($request, CookieCollection::create('hello', 'WORLD!'));
@@ -57,10 +58,11 @@ class CookiesRequestTest extends TestCase
 
     /**
      * @test
+     * @throws TypeException
      */
     public function testModifiesCookies(): void
     {
-        $request = (new CookieRequestTesting())
+        $request = new CookieRequestTesting()
             ->withHeader(Cookies::COOKIE_HEADER, 'theme=light; sessionToken=RAPELCGRQ; hello=world');
 
         $request = CookiesRequest::modify($request, 'hello', function (CookieCollection $cookie) {
@@ -78,7 +80,7 @@ class CookiesRequestTest extends TestCase
      */
     public function testRemovesCookies(): void
     {
-        $request = (new CookieRequestTesting())
+        $request = new CookieRequestTesting()
             ->withHeader(Cookies::COOKIE_HEADER, 'theme=light; sessionToken=RAPELCGRQ; hello=world');
 
         $request = CookiesRequest::remove($request, 'sessionToken');

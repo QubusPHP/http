@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Http\Message\ResponseInterface;
+use Qubus\Exception\Data\TypeException;
 use Qubus\Http\Cookies\SetCookieCollection;
 use Qubus\Http\Cookies\SetCookies;
 use Qubus\Tests\Http\Cookies\CookieResponseTesting;
@@ -29,7 +30,7 @@ class SetCookiesTest extends TestCase
 {
     use ProphecyTrait;
 
-    public const INTERFACE_PSR_HTTP_MESSAGE_RESPONSE = ResponseInterface::class;
+    public const string INTERFACE_PSR_HTTP_MESSAGE_RESPONSE = ResponseInterface::class;
 
     /**
      * @param string[]    $setCookieStrings
@@ -49,10 +50,11 @@ class SetCookiesTest extends TestCase
     }
 
     /**
-     * @param string[]              $setCookieStrings
+     * @param string[] $setCookieStrings
      * @param SetCookieCollection[] $expectedSetCookies
      * @test
      * @dataProvider provideSetCookieStringsAndExpectedSetCookiesData
+     * @throws TypeException
      */
     public function testCreatesFromSetCookieStrings(array $setCookieStrings, array $expectedSetCookies): void
     {
@@ -62,10 +64,11 @@ class SetCookiesTest extends TestCase
     }
 
     /**
-     * @param string[]              $setCookieStrings
+     * @param string[] $setCookieStrings
      * @param SetCookieCollection[] $expectedSetCookies
      * @test
      * @dataProvider provideSetCookieStringsAndExpectedSetCookiesData
+     * @throws TypeException
      */
     public function testKnowsWhichSetCookiesAreAvailable(array $setCookieStrings, array $expectedSetCookies): void
     {
@@ -82,6 +85,7 @@ class SetCookiesTest extends TestCase
      * @param string[] $setCookieStrings
      * @test
      * @dataProvider provideGetsSetCookieByNameData
+     * @throws TypeException
      */
     public function testGetsSetCookieByName(
         array $setCookieStrings,
@@ -95,6 +99,7 @@ class SetCookiesTest extends TestCase
 
     /**
      * @test
+     * @throws TypeException
      */
     public function testRendersAddedAndRemovedSetCookiesHeader(): void
     {
@@ -124,7 +129,7 @@ class SetCookiesTest extends TestCase
         // Shows how to access and manipulate cookies using PSR-7 Response
         // instances from outside the Response object itself.
         // Simulate a response coming in with several cookies.
-        $response = (new CookieResponseTesting())
+        $response = new CookieResponseTesting()
             ->withAddedHeader(SetCookies::SET_COOKIE_HEADER, 'theme=light')
             ->withAddedHeader(SetCookies::SET_COOKIE_HEADER, 'sessionToken=ENCRYPTED')
             ->withAddedHeader(SetCookies::SET_COOKIE_HEADER, 'hello=world');
@@ -156,8 +161,11 @@ class SetCookiesTest extends TestCase
         );
     }
 
-    /** @return string[][][]|SetCookie[][][] */
-    public function provideSetCookieStringsAndExpectedSetCookiesData()
+    /**
+     * @return string[][][]|SetCookieCollection[][][]
+     * @throws TypeException
+     */
+    public static function provideSetCookieStringsAndExpectedSetCookiesData(): array
     {
         return [
             [
@@ -200,8 +208,11 @@ class SetCookiesTest extends TestCase
         ];
     }
 
-    /** @return string[][]|string[][][]|SetCookie[][]|null[][] */
-    public function provideGetsSetCookieByNameData(): array
+    /**
+     * @return string[][]|string[][][]|SetCookieCollection[][]|null[][]
+     * @throws TypeException
+     */
+    public static function provideGetsSetCookieByNameData(): array
     {
         return [
             [
