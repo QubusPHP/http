@@ -35,7 +35,7 @@ class NativeSession implements PhpSession
 {
     protected bool $started = false;
 
-    protected const SESSION_OPTIONS = [
+    protected const array SESSION_OPTIONS = [
         'use_cookies'            => 1,
         'cookie_secure'          => 1,
         'cookie_lifetime'        => 360,

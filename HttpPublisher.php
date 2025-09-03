@@ -38,13 +38,11 @@ class HttpPublisher implements Publisher
      */
     public function publish(
         ResponseInterface|StreamInterface $content,
-        ?EmitterInterface $emitter
+        ?EmitterInterface $response
     ): bool|ResponseInterface {
-        $content = empty($content) ? '' : $content;
-
-        if (null !== $emitter && $content instanceof ResponseInterface) {
+        if (null !== $response && $content instanceof ResponseInterface) {
             try {
-                return $emitter->emit($content);
+                return $response->emit($content);
             } finally {
                 if (function_exists('fastcgi_finish_request')) {
                     fastcgi_finish_request();
@@ -52,7 +50,7 @@ class HttpPublisher implements Publisher
             }
         }
 
-        if (null === $emitter && $content instanceof ResponseInterface) {
+        if (null === $response && $content instanceof ResponseInterface) {
             $this->emitResponseHeaders($content);
             $content = $content->getBody();
         }

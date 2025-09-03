@@ -24,6 +24,6 @@ class ClientSessionId extends Uuid implements Validatable
      */
     public static function create(?string $id = null): string
     {
-        return (new self($id))->__toString();
+        return new self($id)->__toString();
     }
 }

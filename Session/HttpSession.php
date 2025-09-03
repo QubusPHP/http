@@ -17,7 +17,7 @@ use Qubus\Exception\Data\TypeException;
 
 interface HttpSession
 {
-    public const COOKIE_NAME = "HTTPSESSID";
+    public const string COOKIE_NAME = "HTTPSESSID";
 
     /**
      * Retrieve session entity.

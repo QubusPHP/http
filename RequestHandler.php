@@ -23,7 +23,7 @@ use function array_shift;
 
 final class RequestHandler implements RequestHandlerInterface
 {
-    public const RESPONSE_CODE = 200;
+    public const int RESPONSE_CODE = 200;
 
     public function __construct(
         /** @var ResponseFactoryInterface */
@@ -33,14 +33,14 @@ final class RequestHandler implements RequestHandlerInterface
     ) {
     }
 
-    public function handle(ServerRequestInterface $serverRequest): ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $middleware = $this->middlewares[0] ?? false;
         array_shift($this->middlewares);
 
         return $middleware ?
         $middleware->process(
-            $serverRequest,
+            $request,
             new self($this->responseFactory, $this->middlewares)
         ) : $this->responseFactory->createResponse(self::RESPONSE_CODE);
     }

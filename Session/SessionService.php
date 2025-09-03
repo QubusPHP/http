@@ -24,7 +24,7 @@ use Qubus\Http\Session\Storage\SessionStorage;
 
 class SessionService
 {
-    public const COOKIE_NAME = "QSESSID";
+    public const string COOKIE_NAME = "QSESSID";
 
     public static array $options = [];
 
@@ -88,7 +88,11 @@ class SessionService
                 // The cookie should be expired immediately:
                 $response = CookiesResponse::set(
                     response: $response,
-                    setCookieCollection: $this->cookie->make(name: self::$options['cookie-name'] ?? self::COOKIE_NAME, value: '', maxAge: 0)
+                    setCookieCollection: $this->cookie->make(
+                        name: self::$options['cookie-name'] ?? self::COOKIE_NAME,
+                        value: '',
+                        maxAge: 0
+                    )
                 );
             }
         } else {

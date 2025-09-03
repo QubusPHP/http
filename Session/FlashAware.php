@@ -27,7 +27,6 @@ trait FlashAware
      * @param string|null $redirectUrl Where to redirect once the message is added
      * @param bool $sticky Sticky the message (hides the close button)
      * @return object
-     * @throws SessionException
      */
     public function info(string $message, ?string $redirectUrl = null, bool $sticky = false): object
     {
@@ -41,7 +40,6 @@ trait FlashAware
      * @param string|null $redirectUrl Where to redirect once the message is added
      * @param bool $sticky Sticky the message (hides the close button)
      * @return object
-     * @throws SessionException
      */
     public function success(string $message, ?string $redirectUrl = null, bool $sticky = false): object
     {
@@ -55,7 +53,6 @@ trait FlashAware
      * @param string|null $redirectUrl Where to redirect once the message is added
      * @param bool $sticky Sticky the message (hides the close button)
      * @return object
-     * @throws SessionException
      */
     public function warning(string $message, ?string $redirectUrl = null, bool $sticky = false): object
     {
@@ -69,7 +66,6 @@ trait FlashAware
      * @param string|null $redirectUrl Where to redirect once the message is added
      * @param bool $sticky Sticky the message (hides the close button)
      * @return object
-     * @throws SessionException
      */
     public function error(string $message, ?string $redirectUrl = null, bool $sticky = false): object
     {
@@ -83,7 +79,6 @@ trait FlashAware
      * @param string|null $redirectUrl Where to redirect once the message is added
      * @param string $type The $msgType
      * @return object
-     * @throws SessionException
      */
     public function sticky(string $message, ?string $redirectUrl = null, string $type = MessageType::DEFAULT): object
     {
@@ -98,7 +93,6 @@ trait FlashAware
      * @param string|null $redirectUrl Where to redirect once the message is added
      * @param bool $sticky Whether the message is stickied
      * @return object|bool
-     * @throws SessionException
      */
     public function add(
         string $message,

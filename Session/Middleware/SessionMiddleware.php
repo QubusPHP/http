@@ -25,7 +25,7 @@ use Qubus\Http\Session\SessionService;
 
 final class SessionMiddleware implements MiddlewareInterface
 {
-    public const SESSION_ATTRIBUTE = 'qubus.session';
+    public const string SESSION_ATTRIBUTE = 'qubus.session';
 
     public function __construct(public readonly SessionService $sessionService)
     {

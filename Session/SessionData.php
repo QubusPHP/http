@@ -71,7 +71,7 @@ final class SessionData implements HttpSession
             if ($object->isEmpty()) {
                 unset($data[$type]);
             } else {
-                $data[$type] = [$this->checksum($type), (new JsonSerializer())->serialize($object)];
+                $data[$type] = [$this->checksum($type), new JsonSerializer()->serialize($object)];
             }
         }
 
@@ -93,7 +93,7 @@ final class SessionData implements HttpSession
                 [$checksum, $serialized] = $this->data[$type];
 
                 $this->objects[$type] = $checksum === $this->checksum($type)
-                ? (new JsonSerializer())->unserialize($serialized)
+                ? new JsonSerializer()->unserialize($serialized)
                 : new $type();
             } else {
                 $this->objects[$type] = new $type();
