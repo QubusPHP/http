@@ -6,8 +6,6 @@ namespace Qubus\Http\Factories;
 
 use Laminas\Diactoros\Stream;
 use Laminas\Diactoros\UploadedFile;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
@@ -20,7 +18,6 @@ use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use Qubus\Exception\Data\TypeException;
 use Qubus\Http\Exception\MalformedUrlException;
-use Qubus\Http\Request;
 use Qubus\Http\Response;
 use Qubus\Http\ServerRequest;
 use Qubus\Http\Url;
@@ -33,23 +30,13 @@ use function sprintf;
 
 use const UPLOAD_ERR_OK;
 
-class Psr17Factory implements
-    RequestFactoryInterface,
+class Psr17Factory extends RequestFactory implements
     UriFactoryInterface,
     UploadedFileFactoryInterface,
     StreamFactoryInterface,
     ServerRequestFactoryInterface,
     ResponseFactoryInterface
 {
-    /**
-     * @inheritDoc
-     * @throws MalformedUrlException
-     */
-    public function createRequest(string $method, $uri): RequestInterface
-    {
-        return new Request($uri, $method);
-    }
-
     public function createResponse(int $code = 200, string $reasonPhrase = ''): ResponseInterface
     {
         if (2 > \func_num_args()) {
