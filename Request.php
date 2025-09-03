@@ -114,7 +114,7 @@ final class Request extends BaseRequest implements RequestInterface
         if (null === $method) {
             $method = $this->getMethod();
         }
-        if ([] === $headers) {
+        if ('' === $headers) {
             $headers = $this->getHttpHeaders();
         }
 
