@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Qubus\Tests\Http\Cookies;
 
 use Carbon\CarbonImmutable;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Qubus\Exception\Data\TypeException;
 use Qubus\Http\Cookies\SameSite;
@@ -29,9 +30,9 @@ class SetCookieCollectionTest extends TestCase
 {
     /**
      * @test
-     * @dataProvider provideParsesFromSetCookieStringData
      * @throws TypeException
      */
+    #[DataProvider('provideParsesFromSetCookieStringData')]
     public function testParsesFromSetCookieString(string $cookieString, SetCookieCollection $expectedSetCookie): void
     {
         $setCookie = SetCookieCollection::fromSetCookieString($cookieString);

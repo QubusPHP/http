@@ -65,7 +65,6 @@ final class SameSiteTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Qubus\Exception\Data\TypeException
      */
     public function testCanBeBuiltFromaString(): void
     {

@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Http\Cookies;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -36,8 +37,8 @@ class SetCookiesTest extends TestCase
      * @param string[]    $setCookieStrings
      * @param SetCookieCollection[] $expectedSetCookies
      * @test
-     * @dataProvider provideSetCookieStringsAndExpectedSetCookiesData
      */
+    #[DataProvider('provideSetCookieStringsAndExpectedSetCookiesData')]
     public function testCreatesFromResponse(array $setCookieStrings, array $expectedSetCookies): void
     {
         /** @var ResponseInterface|ObjectProphecy $response */
@@ -53,9 +54,9 @@ class SetCookiesTest extends TestCase
      * @param string[] $setCookieStrings
      * @param SetCookieCollection[] $expectedSetCookies
      * @test
-     * @dataProvider provideSetCookieStringsAndExpectedSetCookiesData
      * @throws TypeException
      */
+    #[DataProvider('provideSetCookieStringsAndExpectedSetCookiesData')]
     public function testCreatesFromSetCookieStrings(array $setCookieStrings, array $expectedSetCookies): void
     {
         $setCookies = SetCookies::fromSetCookieStrings($setCookieStrings);
@@ -67,9 +68,9 @@ class SetCookiesTest extends TestCase
      * @param string[] $setCookieStrings
      * @param SetCookieCollection[] $expectedSetCookies
      * @test
-     * @dataProvider provideSetCookieStringsAndExpectedSetCookiesData
      * @throws TypeException
      */
+    #[DataProvider('provideSetCookieStringsAndExpectedSetCookiesData')]
     public function testKnowsWhichSetCookiesAreAvailable(array $setCookieStrings, array $expectedSetCookies): void
     {
         $setCookies = SetCookies::fromSetCookieStrings($setCookieStrings);
@@ -84,9 +85,9 @@ class SetCookiesTest extends TestCase
     /**
      * @param string[] $setCookieStrings
      * @test
-     * @dataProvider provideGetsSetCookieByNameData
      * @throws TypeException
      */
+    #[DataProvider('provideGetsSetCookieByNameData')]
     public function testGetsSetCookieByName(
         array $setCookieStrings,
         string $setCookieName,

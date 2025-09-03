@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Qubus\Tests\Http\Cookies;
 
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Qubus\Http\Cookies\CookieCollection;
 
@@ -25,8 +26,8 @@ class CookieCollectionTest extends TestCase
 {
     /**
      * @test
-     * @dataProvider provideParsesOneFromCookieStringData
      */
+    #[DataProvider('provideParsesOneFromCookieStringData')]
     public function testParsesOneFromCookieString(
         string $cookieString,
         string $expectedName,
@@ -40,8 +41,8 @@ class CookieCollectionTest extends TestCase
     /**
      * @param string[] $expectedNameValuePairs
      * @test
-     * @dataProvider provideParsesListFromCookieString
      */
+    #[DataProvider('provideParsesListFromCookieString')]
     public function testParsesListFromCookieString(string $cookieString, array $expectedNameValuePairs): void
     {
         $cookies = CookieCollection::listFromCookieString($cookieString);
