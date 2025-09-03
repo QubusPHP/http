@@ -64,11 +64,11 @@ class Url extends Uri implements UriInterface, JsonSerializable
     {
         $this->originalUrl = $uri;
 
-        if ($uri !== null && $uri !== '/') {
+        if ($uri !== '' && $uri !== '/') {
             $data = $this->parseUrl($uri);
 
-            $this->scheme = $data['scheme'] ?? null;
-            $this->host = $data['host'] ?? null;
+            $this->scheme = $data['scheme'] ?? '';
+            $this->host = $data['host'] ?? '';
             $this->port = $data['port'] ?? null;
             $this->username = isset($data['user']) ? $this->withUserInfo($data['user']) : '';
             $this->password = isset($data['pass']) ? ':' . $data['pass'] : '';
@@ -336,7 +336,7 @@ class Url extends Uri implements UriInterface, JsonSerializable
      */
     public function getAbsoluteUrl(): string
     {
-        $scheme = $this->scheme !== null ? $this->scheme . '://' : '';
+        $scheme = $this->scheme !== '' ? $this->scheme . '://' : '';
         $host = $this->host ?? '';
         $port = $this->port !== null ? ':' . $this->port : '';
         $user = $this->username ?? '';
