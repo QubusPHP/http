@@ -94,8 +94,10 @@ final class Request extends BaseRequest implements RequestInterface
             $this->httpHeaders[strtolower($key)]                        = $value;
             $this->httpHeaders[strtolower(str_replace('_', '-', $key))] = $value;
         }
-        $this->setHost($this->getHttpHeader('http-host'));
-        if (null === $uri) {
+        if (null !== $this->getHttpHeader('http-host')) {
+            $this->setHost($this->getHttpHeader('http-host'));
+        }
+        if (null !== $uri) {
             // Check if special IIS header exist, otherwise use default.
             if (! empty($this->getHttpHeader('unencoded-url'))) {
                 $uri = $this->getScheme() . '://' . $this->getHost() . $this->getHttpHeader('unencoded-url');
@@ -105,17 +107,16 @@ final class Request extends BaseRequest implements RequestInterface
             }
         }
 
-        $this->setUrl(new Url($uri));
-
-        $this->method       = $this->getHttpHeader('request-method');
-        $this->inputHandler = new Handler($this);
-        $this->method       = $this->inputHandler->value('_method', $this->getHttpHeader('request-method'));
-
-        if (null === $method) {
-            $method = $this->getMethod();
+        if (isset($this->httpHeaders['http-host'])) {
+            $this->setUrl(new Url($uri ?? ''));
         }
-        if ('' === $headers) {
-            $headers = $this->getHttpHeaders();
+
+        if (isset($this->httpHeaders['request-method'])) {
+            $this->method       = $this->getHttpHeader('request-method');
+            $this->inputHandler = new Handler($this);
+            $this->method       = $this->inputHandler->value('_method', $this->getHttpHeader('request-method'));
+
+            $method = $this->getMethod();
         }
 
         parent::__construct($uri, $method, $body, $headers);
@@ -137,11 +138,6 @@ final class Request extends BaseRequest implements RequestInterface
     public function getHost(): ?string
     {
         return $this->host;
-    }
-
-    public function getMethod(): string
-    {
-        return $this->method;
     }
 
     /**
@@ -347,6 +343,10 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function getServer(string $name): ?string
     {
+        if (!isset($this->httpHeaders[$name])) {
+            return null;
+        }
+
         if (! $serverValue = $this->httpHeaders[$name]) {
             return null;
         }
