@@ -42,7 +42,10 @@
     "autoload": {
         "psr-4": {
             "Qubus\\Http\\": ""
-        }
+        },
+        "files": [
+            "Swoole/Callback/Helpers/core.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -67,5 +70,9 @@
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "pestphp/pest-plugin": true
         }
+    },
+    "suggest": {
+        "ext-swoole": "You need either ext-swoole or ext-openswoole to use the Swoole Bridge.",
+        "ext-openswoole": "You need either ext-swoole or ext-openswoole to use the Swoole Bridge."
     }
 }

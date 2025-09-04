@@ -210,8 +210,8 @@ class Request implements RequestInterface
             $new->headers[$name][] = $value;
         } else {
             $new->headers[$name] = [
-                    $new->headers[$name],
-                    $value
+                $new->headers[$name],
+                $value
             ];
         }
 
@@ -227,11 +227,13 @@ class Request implements RequestInterface
         }
 
         foreach ($new->headers as $key => $value) {
-            if (strtolower($name) == $key) {
+            if (strtolower($name) === $key) {
                 unset($new->headers[$key]);
                 return $new;
             }
         }
+
+        return $new;
     }
 
     public function getBody(): StreamInterface
