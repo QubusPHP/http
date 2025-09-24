@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace Qubus\Http\Cookies\Encryption\Adapter;
+namespace Qubus\Http\Encryption\Adapter;
 
-use Defuse\Crypto\Crypto;
+use Defuse\Crypto\Crypto as DefuseCrypto;
 use Defuse\Crypto\Exception\EnvironmentIsBrokenException;
 use Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException;
 use Defuse\Crypto\Key;
-use Qubus\Http\Cookies\Encryption\Encryption;
+use Qubus\Http\Encryption\Encryption;
 
 readonly class DefuseEncryption implements Encryption
 {
@@ -32,16 +32,16 @@ readonly class DefuseEncryption implements Encryption
      * @throws WrongKeyOrModifiedCiphertextException
      * @throws EnvironmentIsBrokenException
      */
-    public function decrypt($value): string
+    public function decrypt(string $value, bool $rawBinary = false): string
     {
-        return Crypto::Decrypt($value, $this->key);
+        return DefuseCrypto::Decrypt($value, $this->key, $rawBinary);
     }
 
     /**
      * @throws EnvironmentIsBrokenException
      */
-    public function encrypt($value): string
+    public function encrypt(string $value, bool $rawBinary = false): string
     {
-        return Crypto::Encrypt($value, $this->key);
+        return DefuseCrypto::Encrypt($value, $this->key, $rawBinary);
     }
 }
