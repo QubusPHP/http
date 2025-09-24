@@ -19,7 +19,7 @@ use Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException;
 use Defuse\Crypto\Key;
 use Qubus\Http\Encryption\Encryption;
 
-readonly class DefuseEncryption implements Encryption
+readonly class QubusEncryption implements Encryption
 {
     /**
      * @param Key $key

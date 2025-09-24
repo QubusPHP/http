@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace Qubus\Http\Cookies\Encryption;
+namespace Qubus\Http\Encryption;
 
 interface Decryptor
 {
-    public function decrypt($value);
+    public function decrypt(string $value, bool $rawBinary = false);
 }

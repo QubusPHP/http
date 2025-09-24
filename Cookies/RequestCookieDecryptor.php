@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Qubus\Http\Cookies;
 
 use Psr\Http\Message\RequestInterface;
-use Qubus\Http\Cookies\Encryption\Decryptor;
 use Qubus\Http\Cookies\Validation\Validation;
+use Qubus\Http\Encryption\Decryptor;
 
 use function base64_decode;
 use function count;
