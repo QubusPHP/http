@@ -36,6 +36,44 @@ use function strtoupper;
 
 final class Request extends BaseRequest implements RequestInterface
 {
+    public const string REQUEST_TYPE_GET = 'get';
+    public const string REQUEST_TYPE_POST = 'post';
+    public const string REQUEST_TYPE_PUT = 'put';
+    public const string REQUEST_TYPE_PATCH = 'patch';
+    public const string REQUEST_TYPE_OPTIONS = 'options';
+    public const string REQUEST_TYPE_DELETE = 'delete';
+    public const string REQUEST_TYPE_HEAD = 'head';
+    public const string CONTENT_TYPE_JSON = 'application/json';
+    public const string CONTENT_TYPE_FORM_DATA = 'multipart/form-data';
+    public const string CONTENT_TYPE_X_FORM_ENCODED = 'application/x-www-form-urlencoded';
+
+    public const string FORCE_METHOD_KEY = '_method';
+
+    /**
+     * All request-types
+     * @var string[]
+     */
+    public static array $requestTypes = [
+        self::REQUEST_TYPE_GET,
+        self::REQUEST_TYPE_POST,
+        self::REQUEST_TYPE_PUT,
+        self::REQUEST_TYPE_PATCH,
+        self::REQUEST_TYPE_OPTIONS,
+        self::REQUEST_TYPE_DELETE,
+        self::REQUEST_TYPE_HEAD,
+    ];
+
+    /**
+     * Post request-types.
+     * @var string[]
+     */
+    public static array $requestTypesPost = [
+        self::REQUEST_TYPE_POST,
+        self::REQUEST_TYPE_PUT,
+        self::REQUEST_TYPE_PATCH,
+        self::REQUEST_TYPE_DELETE,
+    ];
+
     /**
      * Additional data.
      *
@@ -49,6 +87,12 @@ final class Request extends BaseRequest implements RequestInterface
      * @var array $httpHeaders
      */
     protected array $httpHeaders = [];
+
+    /**
+     * Request ContentType
+     * @var string
+     */
+    protected string $contentType;
 
     /**
      * Request host.
@@ -91,35 +135,41 @@ final class Request extends BaseRequest implements RequestInterface
     public function __construct($uri = null, ?string $method = null, $body = 'php://temp', array $headers = [])
     {
         foreach ($this->getServerArray() as $key => $value) {
-            $this->httpHeaders[strtolower($key)]                        = $value;
-            $this->httpHeaders[strtolower(str_replace('_', '-', $key))] = $value;
+            $this->httpHeaders[strtolower(string: $key)] = $value;
+            $this->httpHeaders[strtolower(string: str_replace(search: '_', replace: '-', subject: $key))] = $value;
         }
-        if (null !== $this->getHttpHeader('http-host')) {
-            $this->setHost($this->getHttpHeader('http-host'));
+        if (null !== $this->getHttpHeader(name: 'http-host')) {
+            $this->setHost($this->getHttpHeader(name: 'http-host'));
         }
         if (null !== $uri) {
             // Check if special IIS header exist, otherwise use default.
-            if (! empty($this->getHttpHeader('unencoded-url'))) {
-                $uri = $this->getScheme() . '://' . $this->getHost() . $this->getHttpHeader('unencoded-url');
+            if (! empty($this->getHttpHeader(name: 'unencoded-url'))) {
+                $uri = $this->getScheme() . '://' . $this->getHost() . $this->getHttpHeader(name: 'unencoded-url');
             }
-            if (empty($this->getHttpHeader('unencoded-url'))) {
-                $uri = $this->getScheme() . '://' . $this->getHost() . $this->getHttpHeader('request-uri');
+            if (empty($this->getHttpHeader(name: 'unencoded-url'))) {
+                $uri = $this->getScheme() . '://' . $this->getHost() . $this->getHttpHeader(name: 'request-uri');
             }
         }
 
         if (isset($this->httpHeaders['http-host'])) {
-            $this->setUrl(new Url($uri ?? ''));
+            $this->setUrl(url: new Url(uri: $uri ?? ''));
         }
 
-        if (isset($this->httpHeaders['request-method'])) {
-            $this->method       = $this->getHttpHeader('request-method');
-            $this->inputHandler = new Handler($this);
-            $this->method       = $this->inputHandler->value('_method', $this->getHttpHeader('request-method'));
+        $this->withContentType(contentType: (string)$this->getHttpHeader('content-type'));
+        $this->setMethod(
+            method: (string)($_POST[self::FORCE_METHOD_KEY] ?? $this->getHttpHeader('request-method'))
+        );
 
-            $method = $this->getMethod();
-        }
+        $this->inputHandler = new Handler(request: $this);
 
         parent::__construct($uri, $method, $body, $headers);
+    }
+
+    public function isSecure(): bool
+    {
+        return $this->getHttpHeader(name: 'http-x-forwarded-proto') === 'https'
+        || $this->getHttpHeader(name: 'https') !== null
+        || (int)$this->getHttpHeader(name: 'server-port') === 443;
     }
 
     public function getUrl(): Url
@@ -145,7 +195,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function getAuthUser(): ?string
     {
-        return $this->getServer('php-auth-user');
+        return $this->getServer(name: 'php-auth-user');
     }
 
     /**
@@ -153,7 +203,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function getAuthPassword(): ?string
     {
-        return $this->getServer('php-auth-pw');
+        return $this->getServer(name: 'php-auth-pw');
     }
 
     /**
@@ -167,11 +217,50 @@ final class Request extends BaseRequest implements RequestInterface
     }
 
     /**
+     * Get ip address.
+     *
+     * If $safeMode is false, this function will detect Proxys.
+     * But the user can edit this header to whatever he wants!
+     * https://stackoverflow.com/questions/3003145/how-to-get-the-client-ip-address-in-php#comment-25086804
+     *
+     * @param bool $safeMode When enabled, only safe non-spoofable
+     *                       headers will be returned. Note this
+     *                       can cause issues when using proxy.
+     * @return string|null
+     */
+    public function getIp(bool $safeMode = false): ?string
+    {
+        $headers = [];
+        if ($safeMode === false) {
+            $headers = [
+                'http-cf-connecting-ip',
+                'http-client-ip',
+                'http-x-forwarded-for',
+            ];
+        }
+
+        $headers[] = 'remote-addr';
+
+        return $this->getFirstHeader(headers: $headers);
+    }
+
+    /**
+     * Get remote address/ip
+     *
+     * @alias static::getIp
+     * @return string|null
+     */
+    public function getRemoteAddr(): ?string
+    {
+        return $this->getIp();
+    }
+
+    /**
      * Get referer.
      */
     public function getReferer(): ?string
     {
-        return $this->getServer('http-referer');
+        return $this->getServer(name: 'http-referer');
     }
 
     /**
@@ -179,16 +268,93 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function getUserAgent(): ?string
     {
-        return $this->getServer('http-user-agent');
+        return $this->getServer(name: 'http-user-agent');
     }
 
     /**
      * Get header value by name
+     *
+     * @param string            $name Name of the header.
+     * @param string|mixed|null $defaultValue Value to be returned if header is not found.
+     * @param bool              $tryParse When enabled the method will try to find the header
+     *                                    from both client (http) and server-side variants,
+     *                                    if the header is not found.
      */
-    public function getHttpHeader(string $name, ?string $defaultValue = null): ?string
+    public function getHttpHeader(string $name, ?string $defaultValue = null, bool $tryParse = true): ?string
     {
         $name = strtolower(str_replace('_', '-', $name));
-        return $this->httpHeaders[$name] ?? $defaultValue;
+        $header = $this->httpHeaders[$name] ?? null;
+
+        if ($tryParse === true && $header === null) {
+            if (str_starts_with($name, 'http-')) {
+                // Trying to find client header variant which was not found,
+                // searching for header variant without http- prefix.
+                $header = $this->httpHeaders[str_replace(search: 'http-', replace: '', subject: $name)] ?? null;
+            } else {
+                // Trying to find server variant which was not found, searching
+                // for client variant with http- prefix.
+                $header = $this->httpHeaders['http-' . $name] ?? null;
+            }
+        }
+
+        return $header ?? $defaultValue;
+    }
+
+    /**
+     * Will try to find first header from list of headers.
+     *
+     * @param array $headers
+     * @param mixed|null $defaultValue
+     * @return mixed|null
+     */
+    public function getFirstHeader(array $headers, mixed $defaultValue = null): mixed
+    {
+        foreach ($headers as $header) {
+            $header = $this->getHttpHeader(name: $header);
+            if ($header !== null) {
+                return $header;
+            }
+        }
+
+        return $defaultValue;
+    }
+
+    /**
+     * Gets content type which request has been made.
+     *
+     * @return string|null
+     */
+    public function getContentType(): ?string
+    {
+        if (! $contentType = $this->getServer(name: 'content-type')) {
+            return null;
+        }
+
+        return $contentType;
+    }
+
+    /**
+     * Set request content-type
+     * @param string $contentType
+     * @return $this
+     */
+    protected function withContentType(string $contentType): self
+    {
+        $new = clone $this;
+
+        if (strpos($contentType, ';') > 0) {
+            $new->contentType = strtolower(
+                string: substr(
+                    string: $contentType,
+                    offset: 0,
+                    length: strpos(haystack: $contentType, needle: ';')
+                )
+            );
+        } else {
+            $new->contentType = strtolower(string: $contentType);
+        }
+
+        return $new;
     }
 
     /**
@@ -204,7 +370,18 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isFormatAccepted(string $format): bool
     {
-        return $this->getServer('http-accept') !== null && stripos($this->getServer('http-accept'), $format) !== false;
+        return $this->getServer(name: 'http-accept') !== null
+        && stripos(haystack: $this->getServer(name: 'http-accept'), needle: $format) !== false;
+    }
+
+    /**
+     * Returns true if the request is made through Ajax
+     *
+     * @return bool
+     */
+    public function isAjax(): bool
+    {
+        return (strtolower(string: (string)$this->getHttpHeader(name: 'http-x-requested-with')) === 'xmlhttprequest');
     }
 
     /**
@@ -214,13 +391,13 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function getBasicAuth(): ?array
     {
-        if (! $this->hasServer('php-auth-user') || ! $this->hasServer('php-auth-pw')) {
+        if (! $this->hasServer(name: 'php-auth-user') || ! $this->hasServer(name: 'php-auth-pw')) {
             return null;
         }
 
         return [
-            'username' => $this->getServer('php-auth-user'),
-            'password' => $this->getServer('php-auth-pw'),
+            'username' => $this->getServer(name: 'php-auth-user'),
+            'password' => $this->getServer(name: 'php-auth-pw'),
         ];
     }
 
@@ -233,14 +410,14 @@ final class Request extends BaseRequest implements RequestInterface
     {
         $auth = [];
 
-        if ($digest = $this->getServer('php-auth-digest')) {
+        if ($digest = $this->getServer(name: 'php-auth-digest')) {
             $matches = [];
 
             if (! preg_match_all("#(\\w+)=(['\"]?)([^'\" ,]+)\\2#", $digest, $matches, 2)) {
                 return $auth;
             }
 
-            if (is_array($matches)) {
+            if (is_array(value: $matches)) {
                 foreach ($matches as $match) {
                     $auth[$match[1]] = $match[3];
                 }
@@ -264,42 +441,30 @@ final class Request extends BaseRequest implements RequestInterface
          * Proxies uses this IP.
          */
         if ($trustForwardedHeader) {
-            $address = $this->getServer('http-x-forwarded-for');
+            $address = $this->getServer(name: 'http-x-forwarded-for');
 
             if ($address === null) {
-                $address = $this->getServer('http-client-ip');
+                $address = $this->getServer(name: 'http-client-ip');
             }
         }
 
         if ($address === null) {
-            $address = $this->getServer('remote-addr');
+            $address = $this->getServer(name: 'remote-addr');
         }
 
-        if (! is_string($address)) {
+        if (! is_string(value: $address)) {
             return false;
         }
 
-        if (strpos($address, ',')) {
+        if (strpos(haystack: $address, needle: ',')) {
             /**
              * The client address has multiples parts, only return the first
              * part.
              */
-            return explode(',', $address)[0];
+            return explode(separator: ',', string: $address)[0];
         }
 
         return $address;
-    }
-
-    /**
-     * Gets content type which request has been made.
-     */
-    public function getContentType(): ?string
-    {
-        if (! $contentType = $this->getServer('content-type')) {
-            return null;
-        }
-
-        return $contentType;
     }
 
     /**
@@ -307,10 +472,10 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function getServerAddress(): string
     {
-        $serverAddr = $this->getServer('server-addr');
+        $serverAddr = $this->getServer(name: 'server-addr');
 
         if (null === $serverAddr) {
-            return gethostbyname('localhost');
+            return gethostbyname(hostname: 'localhost');
         }
 
         return $serverAddr;
@@ -321,7 +486,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function getServerName(): string
     {
-        $serverName = $this->getServer('server-name');
+        $serverName = $this->getServer(name: 'server-name');
 
         if (null === $serverName) {
             return 'localhost';
@@ -363,18 +528,13 @@ final class Request extends BaseRequest implements RequestInterface
     }
 
     /**
-     * Checks whether request has been made using ajax.
+     * Returns true when request-method is type that could contain data in the page body.
+     *
+     * @return bool
      */
-    public function isAjax(): bool
+    public function isPostBack(): bool
     {
-        if (
-            array_key_exists('HTTP_X_REQUESTED_WITH', $this->getServerArray()) &&
-            $this->getServer('http-x-requested-with') === 'XMLHttpRequest'
-        ) {
-            return true;
-        }
-
-        return false;
+        return in_array(needle: $this->getMethod(), haystack: self::$requestTypesPost, strict: true);
     }
 
     /**
@@ -384,25 +544,31 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function getAcceptFormats(): array
     {
-        return explode(',', $this->getServer('http-accept'));
+        return explode(separator: ',', string: $this->getHttpHeader(name: 'http-accept'));
     }
 
     public function setUrl(Url $url): void
     {
         $this->url = $url;
-        if ($this->url->getHost() === null) {
-            $this->url->withHost((string) $this->getHost());
+
+        if ($this->isSecure() === true) {
+            $this->url->withScheme(scheme: 'https');
         }
     }
 
     public function setHost(?string $host): void
     {
+        // Strip any potential ports from hostname
+        if (str_contains((string)$host, ':')) {
+            $host = strstr(haystack: $host, needle: strrchr(haystack: $host, needle: ':'), before_needle: true);
+        }
+
         $this->host = $host;
     }
 
     public function setMethod(string $method): void
     {
-        $this->method = strtolower($method);
+        $this->method = strtolower(string: $method);
     }
 
     /**
@@ -416,12 +582,13 @@ final class Request extends BaseRequest implements RequestInterface
     /**
      * Set rewrite url.
      *
-     * @return static
+     * @return $this
      */
     public function setRewriteUrl(string $rewriteUrl): self
     {
         $this->hasPendingRewrite = true;
-        $this->rewriteUrl = rtrim($rewriteUrl, '/') . '/';
+        $this->rewriteUrl = rtrim(string: $rewriteUrl, characters: '/') . '/';
+
         return $this;
     }
 
@@ -432,7 +599,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isMethod(string $method): bool
     {
-        return $this->getMethod() === strtoupper($method);
+        return $this->getMethod() === strtoupper(string: $method);
     }
 
     /**
@@ -440,7 +607,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isDelete(): bool
     {
-        return $this->isMethod('delete');
+        return $this->isMethod(method: 'delete');
     }
 
     /**
@@ -448,7 +615,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isGet(): bool
     {
-        return $this->isMethod('get');
+        return $this->isMethod(method: 'get');
     }
 
     /**
@@ -456,7 +623,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isHead(): bool
     {
-        return $this->isMethod('head');
+        return $this->isMethod(method: 'head');
     }
 
     /**
@@ -464,7 +631,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isOptions(): bool
     {
-        return $this->isMethod('options');
+        return $this->isMethod(method: 'options');
     }
 
     /**
@@ -472,7 +639,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isPatch(): bool
     {
-        return $this->isMethod('patch');
+        return $this->isMethod(method: 'patch');
     }
 
     /**
@@ -480,7 +647,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isPost(): bool
     {
-        return $this->isMethod('post');
+        return $this->isMethod(method: 'post');
     }
 
     /**
@@ -488,7 +655,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isPut(): bool
     {
-        return $this->isMethod('put');
+        return $this->isMethod(method: 'put');
     }
 
     /**
@@ -496,7 +663,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isConnect(): bool
     {
-        return $this->isMethod('connect');
+        return $this->isMethod(method: 'connect');
     }
 
     /**
@@ -504,23 +671,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isTrace(): bool
     {
-        return $this->isMethod('trace');
-    }
-
-    /**
-     * Checks whether request has been made using a secure layer.
-     */
-    public function isSecure(): bool
-    {
-        if (
-            (array_key_exists('HTTPS', $this->getServerArray()) &&
-            (! empty($this->getServer('https')) && $this->getServer('https') !== 'off')) ||
-            $this->getServer('server-port') === '443'
-        ) {
-            return true;
-        }
-
-        return false;
+        return $this->isMethod(method: 'trace');
     }
 
     /**
@@ -528,7 +679,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isValidHttpMethod(string $method): bool
     {
-        return match (strtoupper($method)) {
+        return match (strtoupper(string: $method)) {
             'GET','POST','PUT','DELETE','HEAD','OPTIONS',
             'PATCH','TRACE','CONNECT' => true,
             default => false,
@@ -537,12 +688,12 @@ final class Request extends BaseRequest implements RequestInterface
 
     protected function getServerArray(): array
     {
-        return $_SERVER ? $_SERVER : [];
+        return $_SERVER ?? [];
     }
 
     public function __isset(string $name)
     {
-        return array_key_exists($name, $this->data) === true;
+        return array_key_exists(key: $name, array: $this->data) === true;
     }
 
     public function __set(string $name, ?string $value = null)

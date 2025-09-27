@@ -17,6 +17,7 @@ use JsonSerializable;
 use Laminas\Diactoros\Uri;
 use Psr\Http\Message\UriInterface;
 use Qubus\Http\Exception\MalformedUrlException;
+use SensitiveParameter;
 
 use function array_diff_key;
 use function array_filter;
@@ -38,24 +39,43 @@ use function urlencode;
 
 class Url extends Uri implements UriInterface, JsonSerializable
 {
-    private null|string $originalUrl = null;
+    //phpcs:disable
+    public null|string $originalUrl = null {
+        get => $this->originalUrl;
+    }
 
     private string $scheme = '';
 
-    private string $username = '';
+    public ?string $username = null {
+        get => $this->username;
+    }
 
-    private string $password = '';
+    private ?string $password = null {
+        get => $this->password;
+    }
 
     private string $host = '';
 
-    private null|int|string $port = null;
+    private ?int $port = null;
 
     private string $path = '';
 
-    /** @var array $params */
-    private array $params = [];
+    /**
+     * Original path with no sanitization to ending slash.
+     *
+     * @var string|null
+     */
+    private ?string $originalPath = null {
+        get => $this->originalPath;
+    }
 
-    private null|string $fragment = null;
+    /** @var array $params */
+    private array $params = [] {
+        get => $this->params;
+    }
+
+    private string $fragment = '';
+    //phpcs:enable
 
     /**
      * @throws MalformedUrlException
@@ -63,32 +83,45 @@ class Url extends Uri implements UriInterface, JsonSerializable
     public function __construct(string $uri = '')
     {
         $this->originalUrl = $uri;
-
-        if ($uri !== '' && $uri !== '/') {
-            $data = $this->parseUrl($uri);
-
-            $this->scheme = $data['scheme'] ?? '';
-            $this->host = $data['host'] ?? '';
-            $this->port = $data['port'] ?? null;
-            $this->username = isset($data['user']) ? $this->withUserInfo($data['user']) : '';
-            $this->password = isset($data['pass']) ? ':' . $data['pass'] : '';
-
-            if (isset($data['path']) === true) {
-                $this->setPath($data['path']);
-            }
-
-            $this->fragment = $data['fragment'] ?? null;
-
-            if (isset($data['query']) === true) {
-                $this->setQueryString($data['query']);
-            }
-        }
+        $this->parseUrl($uri);
 
         parent::__construct($uri);
     }
 
     /**
-     * Check if url is using a secure protocol like https
+     * @throws MalformedUrlException
+     */
+    public function parse(?string $url = null, bool $originalPath = false): self
+    {
+        if ($url !== null && $url !== '') {
+            $data = $this->parseUrl($url);
+
+            $this->scheme = $data['scheme'] ?? null;
+            $this->host = $data['host'] ?? null;
+            $this->port = $data['port'] ?? null;
+            $this->username = $data['user'] ?? null;
+            $this->password = $data['pass'] ?? null;
+
+            if (isset($data['path']) === true) {
+                $this->withPath($data['path']);
+
+                if ($originalPath === true) {
+                    $this->originalPath = $data['path'];
+                }
+            }
+
+            $this->fragment = $data['fragment'] ?? null;
+
+            if (isset($data['query']) === true) {
+                $this->withQueryString($data['query']);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if url is using a secure protocol like https.
      */
     public function isSecure(): bool
     {
@@ -96,7 +129,7 @@ class Url extends Uri implements UriInterface, JsonSerializable
     }
 
     /**
-     * Checks if url is relative
+     * Checks if url is relative.
      */
     public function isRelative(): bool
     {
@@ -104,11 +137,31 @@ class Url extends Uri implements UriInterface, JsonSerializable
     }
 
     /**
-     * Get path from url
+     * Set the username of the url
+     *
+     * @param string $username
+     * @return static
      */
-    public function getPath(): string
+    public function withUsername(string $username): self
     {
-        return $this->path ?? '/';
+        $new           = clone $this;
+        $new->username = $username;
+
+        return $new;
+    }
+
+    /**
+     * Set the url password
+     *
+     * @param string $password
+     * @return static
+     */
+    public function withPassword(#[SensitiveParameter] string $password): self
+    {
+        $new           = clone $this;
+        $new->password = $password;
+
+        return $new;
     }
 
     /**
@@ -116,21 +169,12 @@ class Url extends Uri implements UriInterface, JsonSerializable
      *
      * @return static
      */
-    public function setPath(string $path): self
+    public function withPath(string $path): self
     {
-        $this->path = rtrim($path, '/') . '/';
+        $new       = clone $this;
+        $new->path = rtrim($path, '/') . '/';
 
-        return $this;
-    }
-
-    /**
-     * Get query-string from url
-     *
-     * @return array
-     */
-    public function getParams(): array
-    {
-        return $this->params;
+        return $new;
     }
 
     /**
@@ -141,7 +185,7 @@ class Url extends Uri implements UriInterface, JsonSerializable
      */
     public function mergeParams(array $params): self
     {
-        return $this->setParams(array_merge($this->getParams(), $params));
+        return $this->withParams(array_merge($this->params, $params));
     }
 
     /**
@@ -150,11 +194,12 @@ class Url extends Uri implements UriInterface, JsonSerializable
      * @param array $params
      * @return static
      */
-    public function setParams(array $params): self
+    public function withParams(array $params): self
     {
-        $this->params = $params;
+        $new         = clone $this;
+        $new->params = $params;
 
-        return $this;
+        return $new;
     }
 
     /**
@@ -162,12 +207,12 @@ class Url extends Uri implements UriInterface, JsonSerializable
      *
      * @return static
      */
-    public function setQueryString(string $queryString): self
+    public function withQueryString(string $queryString): self
     {
         $params = [];
 
         if (parse_str($queryString, $params) !== false) {
-            return $this->setParams($params);
+            return $this->withParams($params);
         }
 
         return $this;
@@ -178,7 +223,7 @@ class Url extends Uri implements UriInterface, JsonSerializable
      */
     public function getQueryString(): string
     {
-        return static::arrayToParams($this->getParams());
+        return static::arrayToParams($this->params);
     }
 
     /**
@@ -190,29 +235,12 @@ class Url extends Uri implements UriInterface, JsonSerializable
     }
 
     /**
-     * Set url fragment
-     *
-     * @return static
-     */
-    public function setFragment(string $fragment): self
-    {
-        $this->fragment = $fragment;
-
-        return $this;
-    }
-
-    public function getOriginalUrl(): string
-    {
-        return $this->originalUrl;
-    }
-
-    /**
      * Get position of value.
      * Returns -1 on failure.
      */
     public function indexOf(string $value): int
     {
-        $index = stripos($this->getOriginalUrl(), $value);
+        $index = stripos($this->originalUrl, $value);
 
         return $index === false ? -1 : $index;
     }
@@ -222,7 +250,7 @@ class Url extends Uri implements UriInterface, JsonSerializable
      */
     public function contains(string $value): bool
     {
-        return stripos($this->getOriginalUrl(), $value) !== false;
+        return stripos($this->originalUrl, $value) !== false;
     }
 
     /**
@@ -230,21 +258,20 @@ class Url extends Uri implements UriInterface, JsonSerializable
      */
     public function hasParam(string $name): bool
     {
-        return array_key_exists($name, $this->getParams());
+        return array_key_exists($name, $this->params);
     }
 
     /**
      * Removes multiple parameters from the query-string
      *
-     * @param array ...$names
+     * @param int[]|string[] ...$names
      * @return static
      */
     public function removeParams(...$names): self
     {
-        $params = array_diff_key($this->getParams(), array_flip($names));
-        $this->setParams($params);
+        $params = array_diff_key($this->params, array_flip($names));
 
-        return $this;
+        return $this->withParams($params);
     }
 
     /**
@@ -254,20 +281,19 @@ class Url extends Uri implements UriInterface, JsonSerializable
      */
     public function removeParam(string $name): self
     {
-        $params = $this->getParams();
+        $params = $this->params;
         unset($params[$name]);
-        $this->setParams($params);
 
-        return $this;
+        return $this->withParams($params);
     }
 
     /**
      * Get parameter by name.
      * Returns parameter value or default value.
      */
-    public function getParam(string $name, ?string $defaultValue): ?string
+    public function getParam(string $name, ?string $defaultValue = null): ?string
     {
-        return $this->getParams()[$name] ?? $defaultValue;
+        return (isset($this->params[$name]) === true) ? $this->params[$name] : $defaultValue;
     }
 
     /**
@@ -282,21 +308,21 @@ class Url extends Uri implements UriInterface, JsonSerializable
     {
         $encodedUrl = preg_replace_callback(
             '/[^:\/@?&=#]+/u',
-            fn ($matches) => urlencode($matches[0]),
+            static fn ($matches): string => urlencode($matches[0]),
             $url
         );
 
         $parts = parse_url($encodedUrl, $component);
 
         if ($parts === false) {
-            throw new MalformedUrlException(sprintf('Failed to parse url: "%s"', $url));
+            throw new MalformedUrlException(message: sprintf('Failed to parse url: "%s"', $url));
         }
 
-        return array_map('urldecode', $parts);
+        return array_map(callback: 'urldecode', array: $parts);
     }
 
     /**
-     * Convert array to query-string params
+     * Convert array to query-string params.
      *
      * @param array $getParams
      * @param bool $includeEmpty
@@ -306,12 +332,10 @@ class Url extends Uri implements UriInterface, JsonSerializable
     {
         if (count($getParams) !== 0) {
             if ($includeEmpty === false) {
-                $getParams = array_filter($getParams, function ($item) {
-                    return trim($item) !== '';
-                });
+                $getParams = array_filter(array: $getParams, callback: static fn ($item): bool => trim($item) !== '');
             }
 
-            return http_build_query($getParams);
+            return http_build_query(data: $getParams);
         }
 
         return '';
@@ -319,49 +343,56 @@ class Url extends Uri implements UriInterface, JsonSerializable
 
     /**
      * Returns the relative url
+     *
+     * @param bool $includeParams
+     * @return string
      */
-    public function getRelativeUrl(): string
+    public function getRelativeUrl(bool $includeParams = true): string
     {
-        $params = $this->getQueryString();
+        $path = $this->path ?? '/';
 
-        $path     = $this->path ?? '';
-        $query    = $params !== '' ? '?' . $params : '';
-        $fragment = isset($this->fragment) ? '#' . $this->fragment : '';
+        if ($includeParams === false) {
+            return $path;
+        }
+
+        $query = $this->getQueryString() !== '' ? '?' . $this->getQueryString() : '';
+        $fragment = $this->fragment !== '' ? '#' . $this->fragment : '';
 
         return $path . $query . $fragment;
     }
 
     /**
      * Returns the absolute url
+     *
+     * @param bool $includeParams
+     * @return string
      */
-    public function getAbsoluteUrl(): string
+    public function getAbsoluteUrl(bool $includeParams = true): string
     {
         $scheme = $this->scheme !== '' ? $this->scheme . '://' : '';
         $host = $this->host ?? '';
         $port = $this->port !== null ? ':' . $this->port : '';
         $user = $this->username ?? '';
-        $pass = $this->password !== '' ? ':' . $this->password : '';
-        $pass = $user || $pass ? $pass . '@' : '';
+        $pass = $this->password !== null ? ':' . $this->password : '';
+        $pass = ($user !== '' || $pass !== '') ? $pass . '@' : '';
 
-        return $scheme . $user . $pass . $host . $port . $this->getRelativeUrl();
+        return $scheme . $user . $pass . $host . $port . $this->getRelativeUrl($includeParams);
     }
 
     /**
-     * Specify data which should be serialized to JSON
+     * Specify data which should be serialized to JSON.
      *
      * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
-     *
-     * @return string data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
-     * @since 5.4.0
+     * @return string Data which can be serialized by <b>json_encode</b>,
+     *                which is a value of any type other than a resource.
      */
     public function jsonSerialize(): string
     {
-        return $this->getRelativeUrl();
+        return $this->getHost() . $this->getRelativeUrl();
     }
 
     public function __toString(): string
     {
-        return $this->getRelativeUrl();
+        return $this->getHost() . $this->getRelativeUrl();
     }
 }

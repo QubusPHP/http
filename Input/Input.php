@@ -13,11 +13,16 @@ declare(strict_types=1);
 
 namespace Qubus\Http\Input;
 
+use ArrayAccess;
+use ArrayIterator;
+use IteratorAggregate;
+use Traversable;
+
 use function str_replace;
 use function strtolower;
 use function ucfirst;
 
-class Input implements Item
+class Input implements Item, ArrayAccess, IteratorAggregate
 {
     public string|int|null $index = null;
 
@@ -79,5 +84,34 @@ class Input implements Item
     public function __toString(): string
     {
         return (string) $this->value;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->value[$offset]);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        if ($this->offsetExists($offset) === true) {
+            return $this->value[$offset];
+        }
+
+        return null;
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->value[$offset] = $value;
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->value[$offset]);
+    }
+
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->getValue());
     }
 }

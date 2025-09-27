@@ -29,11 +29,11 @@ class File implements Item
 {
     public string|int $index;
     public string $name;
-    public string $filename;
-    public int $size;
-    public string $type;
-    public int $errors;
-    public string $tmpName;
+    public ?string $filename = null;
+    public ?int $size = null;
+    public ?string $type = null;
+    public int $errors = 0;
+    public ?string $tmpName = null;
 
     public function __construct(string|int $index)
     {
@@ -66,7 +66,7 @@ class File implements Item
 
         $values = array_merge($extended, $values);
 
-        return (new static($values['index']))
+        return new static($values['index'])
             ->setSize((int) $values['size'])
             ->setError((int) $values['error'])
             ->setType($values['type'])
@@ -210,9 +210,9 @@ class File implements Item
     /**
      * Get upload-error code.
      */
-    public function getError(): int
+    public function getError(): ?int
     {
-        return (int) $this->errors;
+        return $this->errors;
     }
 
     /**
@@ -220,9 +220,9 @@ class File implements Item
      *
      * @return static
      */
-    public function setError(int $error): Item
+    public function setError(?int $error = null): Item
     {
-        $this->errors = (int) $error;
+        $this->errors = $error;
         return $this;
     }
 
