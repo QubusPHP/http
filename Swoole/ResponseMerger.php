@@ -23,7 +23,6 @@ class ResponseMerger
 {
     public const int FSTAT_MODE_S_IFIFO = 0010000;
     public const int BUFFER_SIZE = 8192;
-
     protected const string FILES_STREAM_TYPE = 'STDIO';
     protected const string FILES_WRAPPER_TYPE = 'plainfile';
 
