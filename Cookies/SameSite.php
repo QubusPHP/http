@@ -23,9 +23,9 @@ final class SameSite
     /**
      * The possible string values of the SameSite setting
      */
-    private const STRICT = 'Strict';
-    private const LAX    = 'Lax';
-    private const NONE   = 'None';
+    private const string STRICT = 'Strict';
+    private const string LAX    = 'Lax';
+    private const string NONE   = 'None';
 
     private function __construct(private string $value)
     {

@@ -23,7 +23,7 @@ final class Cookies
     /**
      * The name of the Cookie header.
      */
-    public const COOKIE_HEADER = 'Cookie';
+    public const string COOKIE_HEADER = 'Cookie';
 
     /** @var CookieCollection[] */
     private array $cookies = [];

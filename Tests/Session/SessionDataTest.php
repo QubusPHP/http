@@ -66,7 +66,7 @@ class SessionDataTest extends TestCase
 
         Assert::assertInstanceOf(UserSession::class, $model, 'it creates a new model instance');
 
-        $model->setId(self::USER_ID);
+        $model->withId(self::USER_ID);
 
         Assert::assertSame($model, $this->session->get(UserSession::class), 'it returns the same instance every time');
     }
@@ -79,14 +79,22 @@ class SessionDataTest extends TestCase
     public function testDataCanBeReturnedAndCleared()
     {
         $model = $this->session->get(UserSession::class);
-        $model->setId(self::USER_ID);
+        $model->withId(self::USER_ID);
 
         $data = $this->session->getData();
 
         $session = new SessionData($this->clientSessionId, $data, false);
 
-        Assert::assertEquals($model, $this->session->get(UserSession::class), 'it restores the entity instance from data');
-        Assert::assertSame($model->userId(), $this->session->get(UserSession::class)->userId(), 'it preserves the entity state');
+        Assert::assertEquals(
+            $model,
+            $this->session->get(UserSession::class),
+            'it restores the entity instance from data'
+        );
+        Assert::assertSame(
+            $model->userId(),
+            $this->session->get(UserSession::class)->userId(),
+            'it preserves the entity state'
+        );
 
         $session->clear();
 

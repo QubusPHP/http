@@ -22,9 +22,12 @@ class UserSession implements SessionEntity
     {
     }
 
-    public function setId(?string $userId = null): void
+    public function withId(?string $userId = null): self
     {
-        $this->userId = $userId;
+        $new = clone $this;
+        $new->userId = $userId;
+
+        return $new;
     }
 
     public function userId(): string|null

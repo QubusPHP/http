@@ -24,7 +24,7 @@ use Qubus\Http\Encryption\Adapter\QubusEncryption;
 use function class_exists;
 use function str_repeat;
 
-class DefuseEncryptionTest extends TestCase
+class QubusEncryptionTest extends TestCase
 {
     protected function setUp(): void
     {

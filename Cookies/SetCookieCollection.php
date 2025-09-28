@@ -134,6 +134,7 @@ final class SetCookieCollection
 
     /**
      * @param DateTimeInterface|int|string|null $expires
+     * @return int
      * @throws TypeException
      */
     private function resolveExpires(DateTimeInterface|int|string|null $expires = null): int
@@ -168,6 +169,7 @@ final class SetCookieCollection
      * Return an instance with the provided expiry.
      *
      * @param DateTimeInterface|int|string|null $expires
+     * @return SetCookieCollection
      * @throws TypeException
      */
     public function withExpires(DateTimeInterface|int|string|null $expires = null): self

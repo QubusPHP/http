@@ -23,7 +23,6 @@ use Psr\Http\Message\ResponseInterface;
 use Qubus\Exception\Data\TypeException;
 use Qubus\Http\Cookies\SetCookieCollection;
 use Qubus\Http\Cookies\SetCookies;
-use Qubus\Tests\Http\Cookies\CookieResponseTesting;
 
 use function str_rot13;
 

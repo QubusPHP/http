@@ -24,7 +24,7 @@ final class SetCookies
     /**
      * The name of the Set-Cookie header.
      */
-    public const SET_COOKIE_HEADER = 'Set-Cookie';
+    public const string SET_COOKIE_HEADER = 'Set-Cookie';
 
     /** @var SetCookieCollection[] */
     private array $setCookies = [];

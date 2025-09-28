@@ -22,8 +22,8 @@ use function mt_rand;
 
 class Validation
 {
-    public const DEFAULT_ALGO = 'sha256';
-    public const NONCE_LENGTH = 32;
+    public const string DEFAULT_ALGO = 'sha256';
+    public const int NONCE_LENGTH = 32;
 
     public readonly string $key;
     public readonly string $algo;
