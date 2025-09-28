@@ -558,11 +558,6 @@ final class Request extends BaseRequest implements RequestInterface
 
     public function setHost(?string $host): void
     {
-        // Strip any potential ports from hostname
-        if (str_contains((string)$host, ':')) {
-            $host = strstr(haystack: $host, needle: strrchr(haystack: $host, needle: ':'), before_needle: true);
-        }
-
         $this->host = $host;
     }
 
