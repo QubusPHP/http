@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace Qubus\Http\Session;
 
-use Qubus\Http\Factories\RedirectResponseFactory;
-
 use function array_key_exists;
 use function array_keys;
+use function header;
 use function is_array;
 use function sha1;
 use function sprintf;
@@ -222,7 +221,7 @@ class Flash
     protected function doRedirect(): static
     {
         if ($this->redirectUrl) {
-            RedirectResponseFactory::create($this->redirectUrl);
+            header(header: 'Location: ' . $this->redirectUrl);
             exit();
         }
         return $this;
@@ -231,8 +230,8 @@ class Flash
     /**
      * Clear the messages from the session data
      *
-     * @param mixed $types (array) Clear all of the message types in array
-     *                        (string)  Only clear the one given message type
+     * @param mixed $types (array)   Clear all the message types in array.
+     *                     (string)  Only clear the one given message type.
      * @return Flash
      */
     protected function clear(mixed $types = []): self
