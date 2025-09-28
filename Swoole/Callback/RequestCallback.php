@@ -11,7 +11,10 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 
+use function extension_loaded;
 use function Laminas\Diactoros\normalizeUploadedFiles;
+
+use const PHP_SAPI;
 
 final class RequestCallback
 {
@@ -70,6 +73,14 @@ final class RequestCallback
 
     private function emit(ResponseInterface $psrResponse, Response $swooleResponse): void
     {
+        if (! extension_loaded(extension: 'swoole') && ! extension_loaded(extension: 'openswoole')) {
+            return;
+        }
+
+        if (PHP_SAPI !== 'cli') {
+            return;
+        }
+
         $swooleResponse->setStatusCode($psrResponse->getStatusCode(), $psrResponse->getReasonPhrase());
 
         foreach ($psrResponse->getHeaders() as $name => $values) {
