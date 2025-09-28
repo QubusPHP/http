@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Qubus\Http\Encryption\Env;
 
-use function str_ends_with;
+use function explode;
+use function str_contains;
 use function str_starts_with;
+use function trim;
 
 final class Parser
 {
@@ -19,24 +21,27 @@ final class Parser
     {
         $lines = explode(separator: "\n", string: $content);
 
-        $object = [];
+        $env = [];
 
         foreach ($lines as $line) {
-            if (preg_match('/^\s*([\w\.\-]+)\s*=\s*(.*)?\s*$/', $line, $matches)) {
-                $key = $matches[1];
-                $value = $matches[2] ?? '';
+            $line = trim(string: $line);
 
-                $length = $value ? strlen(string: $value) : 0;
-                if ($length > 0 && str_starts_with($value, '"') && str_ends_with($value, '"')) {
-                    $value = preg_replace(pattern: '/\\n/gm', replacement: "\n", subject: $value);
-                }
+            // Skip empty or commented lines
+            if ($line === '' || str_starts_with(haystack: $line, needle: '#')) {
+                continue;
+            }
 
-                $value = trim(string: preg_replace(pattern: '/(^[\'"]|[\'"]$)/', replacement: '', subject: $value));
+            // Parse key=value pairs
+            if (str_contains(haystack: $line, needle: '=')) {
+                [$key, $value] = explode(separator: '=', string: $line, limit: 2);
 
-                $object[$key] = $value;
+                $key   = trim(string: $key);
+                $value = trim(string: $value, characters: " \t\n\r\0\x0B'\""); // trim spaces and quotes
+
+                $env[$key] = $value;
             }
         }
 
-        return $object;
+        return $env;
     }
 }
