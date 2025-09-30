@@ -36,7 +36,6 @@
         "qubus/valueobjects": "^3"
     },
     "require-dev": {
-        "mockery/mockery": "^1",
         "qubus/qubus-coding-standard": "^2"
     },
     "autoload": {
