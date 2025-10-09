@@ -114,19 +114,7 @@ class NativeSession implements PhpSession
      */
     public function configOptions(): array
     {
-        $config = [
-            'use_cookies'            => $this->config->getConfigKey('session.use_cookies'),
-            'cookie_secure'          => $this->config->getConfigKey('session.cookie_secure'),
-            'cookie_lifetime'        => $this->config->getConfigKey('session.cookie_lifetime'),
-            'cookie_path'            => $this->config->getConfigKey('session.cookie_path'),
-            'cookie_domain'          => $this->config->getConfigKey('session.cookie_domain'),
-            'use_only_cookies'       => $this->config->getConfigKey('session.use_only_cookies'),
-            'cookie_httponly'        => $this->config->getConfigKey('session.cookie_httponly'),
-            'use_strict_mode'        => $this->config->getConfigKey('session.use_strict_mode'),
-            'cache_limiter'          => $this->config->getConfigKey('session.cache_limiter'),
-            'cache_expire'           => $this->config->getConfigKey('session.cache_expire'),
-            'cookie_samesite'        => $this->config->getConfigKey('session.cookie_samesite'),
-        ];
+        $config = $this->config->getConfigKey(key: 'session');
 
         return array_merge(self::SESSION_OPTIONS, $config);
     }
