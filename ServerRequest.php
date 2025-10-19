@@ -16,7 +16,7 @@ namespace Qubus\Http;
 use Laminas\Diactoros\ServerRequest as BaseServerRequest;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class ServerRequest extends BaseServerRequest implements ServerRequestInterface
+class ServerRequest extends BaseServerRequest implements ServerRequestInterface
 {
     public function __construct(
         array $serverParams = [],
