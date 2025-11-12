@@ -20,7 +20,6 @@ use Qubus\Exception\Data\TypeException;
 use Qubus\Http\Cookies\CookieCollection;
 use Qubus\Http\Cookies\Cookies;
 use Qubus\Http\Cookies\CookiesRequest;
-use Qubus\Tests\Http\Cookies\CookieRequestTesting;
 
 use function strtoupper;
 

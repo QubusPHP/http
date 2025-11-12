@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Qubus\Tests\Http\Cookies;
 
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 
@@ -26,25 +27,25 @@ trait CookieMessageTesting
     private array $headers = [];
 
     /** {@inheritDoc} */
-    public function getProtocolVersion(): void
+    public function getProtocolVersion(): string
     {
         throw new RuntimeException('This method has not been implemented.');
     }
 
     /** {@inheritDoc} */
-    public function withProtocolVersion($version): void
+    public function withProtocolVersion($version): MessageInterface
     {
         throw new RuntimeException('This method has not been implemented.');
     }
 
     /** {@inheritDoc} */
-    public function hasHeader($name): void
+    public function hasHeader($name): bool
     {
         throw new RuntimeException('This method has not been implemented.');
     }
 
     /** {@inheritDoc} */
-    public function withHeader($name, $value)
+    public function withHeader($name, $value): CookieRequestTesting|CookieResponseTesting
     {
         $clone = clone $this;
 
@@ -54,7 +55,7 @@ trait CookieMessageTesting
     }
 
     /** {@inheritDoc} */
-    public function withAddedHeader($name, $value)
+    public function withAddedHeader($name, $value): CookieRequestTesting|CookieResponseTesting
     {
         $clone = clone $this;
 
@@ -68,7 +69,7 @@ trait CookieMessageTesting
     }
 
     /** {@inheritDoc} */
-    public function withoutHeader($name)
+    public function withoutHeader($name): CookieRequestTesting|CookieResponseTesting
     {
         $clone = clone $this;
 
@@ -80,41 +81,40 @@ trait CookieMessageTesting
     }
 
     /** {@inheritDoc} */
-    public function getBody(): void
+    public function getBody(): StreamInterface
     {
         throw new RuntimeException('This method has not been implemented.');
     }
 
     /** {@inheritDoc} */
-    public function withBody(StreamInterface $body): void
+    public function withBody(StreamInterface $body): MessageInterface
     {
         throw new RuntimeException('This method has not been implemented.');
     }
 
     /** {@inheritDoc} */
-    public function getHeaders(): void
+    public function getHeaders(): array
     {
         throw new RuntimeException('This method has not been implemented.');
     }
 
     /** {@inheritDoc} */
-    public function getHeader($name)
+    public function getHeader($name): array
     {
         if (! isset($this->headers[$name])) {
             return [];
         }
 
-        return $this->headers[$name];
+        return [$this->headers[$name]];
     }
 
     /** {@inheritDoc} */
-    public function getHeaderLine($name)
+    public function getHeaderLine($name): string
     {
         return implode(',', $this->headers[$name]);
     }
 
-    /** {@inheritDoc} */
-    public function getHeaderLines($name)
+    public function getHeaderLines($name): array|string
     {
         if (! isset($this->headers[$name])) {
             return [];

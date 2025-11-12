@@ -24,35 +24,35 @@ class CookieRequestTesting implements RequestInterface
 {
     use CookieMessageTesting;
 
-    public function getRequestTarget(): void
+    public function getRequestTarget(): string
     {
         throw new RuntimeException('This method has not been implemented.');
     }
 
     /** {@inheritDoc} */
-    public function withRequestTarget($requestTarget): void
+    public function withRequestTarget($requestTarget): RequestInterface
     {
         throw new RuntimeException('This method has not been implemented.');
     }
 
-    public function getMethod(): void
-    {
-        throw new RuntimeException('This method has not been implemented.');
-    }
-
-    /** {@inheritDoc} */
-    public function withMethod($method): void
-    {
-        throw new RuntimeException('This method has not been implemented.');
-    }
-
-    public function getUri(): void
+    public function getMethod(): string
     {
         throw new RuntimeException('This method has not been implemented.');
     }
 
     /** {@inheritDoc} */
-    public function withUri(UriInterface $uri, $preserveHost = false): void
+    public function withMethod($method): RequestInterface
+    {
+        throw new RuntimeException('This method has not been implemented.');
+    }
+
+    public function getUri(): UriInterface
+    {
+        throw new RuntimeException('This method has not been implemented.');
+    }
+
+    /** {@inheritDoc} */
+    public function withUri(UriInterface $uri, $preserveHost = false): RequestInterface
     {
         throw new RuntimeException('This method has not been implemented.');
     }
