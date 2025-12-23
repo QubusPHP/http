@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace Qubus\Http\Session;
 
+use Psr\Http\Message\ResponseInterface;
+use Qubus\Http\Factories\RedirectResponseFactory;
+
 use function array_key_exists;
 use function array_keys;
 use function header;
@@ -216,13 +219,12 @@ class Flash
     /**
      * Redirect the user if a URL was given.
      *
-     * @return Flash
+     * @return ResponseInterface|Flash
      */
-    protected function doRedirect(): static
+    protected function doRedirect(): ResponseInterface|static
     {
         if ($this->redirectUrl) {
-            header(header: 'Location: ' . $this->redirectUrl);
-            exit();
+            return RedirectResponseFactory::create($this->redirectUrl);
         }
         return $this;
     }
