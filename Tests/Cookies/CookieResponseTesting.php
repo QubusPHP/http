@@ -22,7 +22,7 @@ class CookieResponseTesting implements ResponseInterface
 {
     use CookieMessageTesting;
 
-    public function getStatusCode(): void
+    public function getStatusCode(): int
     {
         throw new RuntimeException('This method has not been implemented.');
     }
@@ -31,12 +31,12 @@ class CookieResponseTesting implements ResponseInterface
      * @param int    $code
      * @param string $reasonPhrase
      */
-    public function withStatus($code, $reasonPhrase = ''): void
+    public function withStatus($code, $reasonPhrase = ''): ResponseInterface
     {
         throw new RuntimeException('This method has not been implemented.');
     }
 
-    public function getReasonPhrase(): void
+    public function getReasonPhrase(): string
     {
         throw new RuntimeException('This method has not been implemented.');
     }
