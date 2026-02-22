@@ -18,6 +18,7 @@ use ArrayIterator;
 use IteratorAggregate;
 use Traversable;
 
+use function json_encode;
 use function str_replace;
 use function strtolower;
 use function ucfirst;
@@ -28,9 +29,9 @@ class Input implements Item, ArrayAccess, IteratorAggregate
 
     public ?string $name = null;
 
-    public ?string $value = null;
+    public string|array|null $value = null;
 
-    public function __construct(string|int $index, ?string $value = null)
+    public function __construct(string|int $index, string|array|null $value = null)
     {
         $this->index = (string) $index;
         $this->value = $value;
@@ -65,7 +66,7 @@ class Input implements Item, ArrayAccess, IteratorAggregate
         return $this;
     }
 
-    public function getValue(): ?string
+    public function getValue(): string|array|null
     {
         return $this->value;
     }
@@ -83,7 +84,7 @@ class Input implements Item, ArrayAccess, IteratorAggregate
 
     public function __toString(): string
     {
-        return (string) $this->value;
+        return json_encode($this->value);
     }
 
     public function offsetExists(mixed $offset): bool

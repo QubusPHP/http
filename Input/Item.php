@@ -23,7 +23,7 @@ interface Item
 
     public function setName(string $name): self;
 
-    public function getValue(): ?string;
+    public function getValue(): string|array|null;
 
     public function setValue(string $value): self;
 
