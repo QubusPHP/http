@@ -13,11 +13,15 @@ use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\StreamInterface;
 use Swoole\Http\Request as SwooleRequest;
 
-use function array_any;
 use function array_map;
+use function array_merge;
+use function base64_decode;
+use function explode;
 use function implode;
 use function is_array;
+use function preg_match;
 use function str_contains;
+use function str_starts_with;
 use function strtolower;
 
 class Request implements RequestInterface
@@ -46,12 +50,12 @@ class Request implements RequestInterface
 
     private function buildRequestTarget(): string
     {
-        $queryString = !empty($this->swooleRequest->server['query_string'])
+        $path = $this->swooleRequest->server['request_uri'] ?? '/';
+        $queryString = ! empty($this->swooleRequest->server['query_string']) && ! str_contains($path, '?')
         ? '?' . $this->swooleRequest->server['query_string']
         : '';
 
-        return $this->swooleRequest->server['request_uri']
-        . $queryString;
+        return $path . $queryString;
     }
 
     public function withRequestTarget(string $requestTarget): RequestInterface
@@ -70,8 +74,7 @@ class Request implements RequestInterface
 
     public function withMethod(string $method): RequestInterface
     {
-        $validMethods = ['options','get','head','post','put','delete','trace','connect'];
-        if (!in_array(strtolower($method), $validMethods)) {
+        if ($method === '' || ! preg_match('/^[!#$%&\'*+.^_`|~0-9A-Za-z-]+$/D', $method)) {
             throw new InvalidArgumentException(message: 'Invalid HTTP method');
         }
 
@@ -86,29 +89,28 @@ class Request implements RequestInterface
             return $this->uri;
         }
 
-        $userInfo = $this->parseUserInfo() ?? null;
+        $userInfo = $this->parseUserInfo();
+        $scheme = $this->swooleRequest->server['request_scheme'] ?? 'http';
+        $host = $this->swooleRequest->header['host']
+        ?? $this->swooleRequest->server['server_name']
+        ?? 'localhost';
 
-        $host = $this->swooleRequest->header['host'];
-        if (!str_contains((string) $this->swooleRequest->header['host'], ':')) {
-            $host .= ':80';
-        }
-
-        $uri = '//' . (!empty($userInfo) ? $userInfo . '@' : '')
-        . $host
-        . $this->getRequestTarget();
+        $uri = $scheme . '://' . ($userInfo !== null ? $userInfo . '@' : '') . $host . $this->getRequestTarget();
 
         return $this->uri = $this->uriFactory->createUri(
             $uri
         );
     }
 
-    private function parseUserInfo(): false|string|null
+    private function parseUserInfo(): ?string
     {
         $authorization = $this->swooleRequest->header['authorization'] ?? '';
 
-        if (str_starts_with((string) $authorization, 'Basic')) {
-            $parts = explode(' ', (string) $authorization);
-            return base64_decode($parts[1]);
+        if (str_starts_with(strtolower((string) $authorization), 'basic ')) {
+            $parts = explode(' ', (string) $authorization, 2);
+            $decoded = base64_decode($parts[1] ?? '', true);
+
+            return $decoded !== false ? $decoded : null;
         }
 
         return null;
@@ -152,9 +154,7 @@ class Request implements RequestInterface
 
     public function hasHeader($name): bool
     {
-        $this->initHeadersList();
-
-        return array_any($this->headers, fn($key) => strtolower($name) === strtolower($key));
+        return $this->findHeaderName((string) $name) !== null;
     }
 
     private function initHeadersList(): void
@@ -205,15 +205,14 @@ class Request implements RequestInterface
         }
 
         $new = clone $this;
+        $new->initHeadersList();
+        $headerName = $new->findHeaderName($name) ?? $name;
+        $values = is_array($value) ? $value : [$value];
 
-        if (is_array($new->headers[$name])) {
-            $new->headers[$name][] = $value;
-        } else {
-            $new->headers[$name] = [
-                $new->headers[$name],
-                $value
-            ];
-        }
+        $existing = is_array($new->headers[$headerName])
+        ? $new->headers[$headerName]
+        : [$new->headers[$headerName]];
+        $new->headers[$headerName] = array_merge($existing, $values);
 
         return $new;
     }
@@ -227,7 +226,7 @@ class Request implements RequestInterface
         }
 
         foreach ($new->headers as $key => $value) {
-            if (strtolower($name) === $key) {
+            if (strtolower($name) === strtolower($key)) {
                 unset($new->headers[$key]);
                 return $new;
             }
@@ -238,7 +237,7 @@ class Request implements RequestInterface
 
     public function getBody(): StreamInterface
     {
-        return $this->body ?? $this->streamFactory->createStream($this->swooleRequest->rawContent());
+        return $this->body ??= $this->streamFactory->createStream((string) $this->swooleRequest->rawContent());
     }
 
     public function withBody(StreamInterface $body): MessageInterface
@@ -246,5 +245,12 @@ class Request implements RequestInterface
         $new = clone $this;
         $new->body = $body;
         return $new;
+    }
+
+    private function findHeaderName(string $name): ?string
+    {
+        $this->initHeadersList();
+
+        return array_find_key($this->headers, fn($value, $headerName) => strtolower($name) === strtolower($headerName));
     }
 }

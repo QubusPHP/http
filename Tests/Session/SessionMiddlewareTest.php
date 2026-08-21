@@ -76,8 +76,12 @@ class SessionMiddlewareTest extends TestCase
 
         $delegate = new DelegateMock(function (ServerRequestInterface $request) use (&$userEntity) {
             $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
+            $sessionObject = $request->getAttribute(SessionMiddleware::SESSION_OBJECT_ATTRIBUTE);
 
             Assert::assertNotEmpty($session);
+            Assert::assertIsString($session);
+            Assert::assertInstanceOf(HttpSession::class, $sessionObject);
+            Assert::assertFalse($request->hasHeader('X-Session-Id'));
 
             return new Response();
         });

@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Qubus\Http\Session;
 
 use Exception;
+use InvalidArgumentException;
 
-use function assert;
 use function chr;
 use function ord;
 use function random_bytes;
@@ -34,7 +34,9 @@ class SessionId
         // Generate 36 bytes (288 bits) of random data or use the id passed into the function.
         $id = $id ?? random_bytes(36);
 
-        assert(strlen($id) === 36);
+        if (strlen($id) !== 36) {
+            throw new InvalidArgumentException('Session IDs must contain exactly 36 bytes.');
+        }
 
         // Set version to 0100
         $id[6] = chr(ord($id[6]) & 0x0f | 0x40);

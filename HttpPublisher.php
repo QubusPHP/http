@@ -18,7 +18,6 @@ use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
 use LogicException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use Qubus\Http\Factories\HtmlResponseFactory;
 
 use function flush;
 use function function_exists;
@@ -38,7 +37,7 @@ class HttpPublisher implements Publisher
      */
     public function publish(
         ResponseInterface|StreamInterface $content,
-        ?EmitterInterface $response
+        ?EmitterInterface $response = null
     ): bool|ResponseInterface {
         if (null !== $response && $content instanceof ResponseInterface) {
             try {
@@ -57,20 +56,13 @@ class HttpPublisher implements Publisher
 
         flush();
 
-        if ($content instanceof StreamInterface) {
-            try {
-                return $this->emitStreamBody($content);
-            } finally {
-                if (function_exists('fastcgi_finish_request')) {
-                    fastcgi_finish_request();
-                }
+        try {
+            return $this->emitStreamBody($content);
+        } finally {
+            if (function_exists('fastcgi_finish_request')) {
+                fastcgi_finish_request();
             }
         }
-        return HtmlResponseFactory::create(
-            'The response body must be an instance of ResponseInterface or StreamInterface',
-            200,
-            ['Content-Type' => ['application/xhtml+xml']]
-        );
     }
 
     /**

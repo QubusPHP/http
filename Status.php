@@ -112,6 +112,7 @@ class Status
     public const int SITE_IS_OVERLOADED = 529;
     public const int SITE_IS_FROZEN = 530;
     public const int NETWORK_READ_TIMEOUT_ERROR = 598;
+    public const int NETWORK_CONNECT_TIMEOUT_ERROR = 599;
 
     private static array $messages = [
         // [Informational 1xx]
@@ -129,6 +130,7 @@ class Status
         206 => 'Partial Content',
         207 => 'Multi-Status',
         208 => 'Already Reported',
+        218 => 'This Is Fine',
         226 => 'IM Used',
         // [Redirection 3xx]
         300 => 'Multiple Choices',
@@ -184,16 +186,47 @@ class Status
         508 => 'Loop Detected',
         510 => 'Not Extended (OBSOLETED)',
         511 => 'Network Authentication Required',
+        598 => 'Network Read Timeout Error',
         599 => 'Network Connect Timeout Error',
     ];
 
     public static function getMessageForCode(int $code): string
     {
-        return self::$messages[$code];
+        return self::$messages[$code] ?? '';
     }
 
-    public static function isError($code): bool
+    public static function isInformational(mixed $code): bool
     {
-        return is_numeric($code) && $code >= self::BAD_REQUEST;
+        return self::isInRange($code, 100, 199);
+    }
+
+    public static function isSuccessful(mixed $code): bool
+    {
+        return self::isInRange($code, 200, 299);
+    }
+
+    public static function isRedirect(mixed $code): bool
+    {
+        return self::isInRange($code, 300, 399);
+    }
+
+    public static function isClientError(mixed $code): bool
+    {
+        return self::isInRange($code, 400, 499);
+    }
+
+    public static function isServerError(mixed $code): bool
+    {
+        return self::isInRange($code, 500, 599);
+    }
+
+    public static function isError(mixed $code): bool
+    {
+        return self::isClientError($code) || self::isServerError($code);
+    }
+
+    private static function isInRange(mixed $code, int $minimum, int $maximum): bool
+    {
+        return is_numeric($code) && (int) $code >= $minimum && (int) $code <= $maximum;
     }
 }

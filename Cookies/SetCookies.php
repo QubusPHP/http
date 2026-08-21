@@ -103,7 +103,9 @@ final class SetCookies
     {
         return new self(
             array_map(
-                fn (string $setCookieString): SetCookieCollection => SetCookieCollection::fromSetCookieString($setCookieString),
+                fn (string $setCookieString): SetCookieCollection => SetCookieCollection::fromSetCookieString(
+                    $setCookieString
+                ),
                 $setCookieStrings
             )
         );
@@ -111,12 +113,15 @@ final class SetCookies
 
     /**
      * Create SetCookies from a Response.
+     * @throws TypeException
      */
     public static function fromResponse(ResponseInterface $response): SetCookies
     {
         return new self(
             array_map(
-                fn (string $setCookieString): SetCookieCollection => SetCookieCollection::fromSetCookieString($setCookieString),
+                fn (string $setCookieString): SetCookieCollection => SetCookieCollection::fromSetCookieString(
+                    $setCookieString
+                ),
                 $response->getHeader(self::SET_COOKIE_HEADER)
             )
         );

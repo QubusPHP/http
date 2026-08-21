@@ -12,7 +12,6 @@ use Psr\Http\Message\UriFactoryInterface;
 use Swoole\Http\Request as SwooleRequest;
 
 use function array_change_key_case;
-use function array_merge;
 use function is_array;
 use function is_object;
 use function Qubus\Support\Helpers\is_null__;
@@ -39,10 +38,7 @@ class ServerRequest extends Request implements ServerRequestInterface
 
     public function getServerParams(): array
     {
-        return array_merge(
-            $_SERVER ?? [],
-            array_change_key_case($this->swooleRequest->server ?? [], CASE_UPPER)
-        );
+        return array_change_key_case($this->swooleRequest->server ?? [], CASE_UPPER);
     }
 
     public function getCookieParams(): array
@@ -75,19 +71,17 @@ class ServerRequest extends Request implements ServerRequestInterface
             return $this->files;
         }
 
-        $files = [];
-
-        foreach ($this->swooleRequest->files ?? [] as $name => $fileData) {
-            $files[$name] = $this->uploadedFileFactory->createUploadedFile(
+        $files = array_map(function ($fileData) {
+            return $this->uploadedFileFactory->createUploadedFile(
                 $this->streamFactory->createStreamFromFile($fileData['tmp_name']),
                 $fileData['size'],
                 $fileData['error'],
                 $fileData['name'],
                 $fileData['type']
             );
-        }
+        }, $this->swooleRequest->files ?? []);
 
-        return $files;
+        return $this->files = $files;
     }
 
     public function withUploadedFiles(array $uploadedFiles): ServerRequestInterface

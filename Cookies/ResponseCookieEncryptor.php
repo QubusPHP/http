@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Qubus\Http\Cookies;
 
 use Psr\Http\Message\ResponseInterface;
+use Qubus\Exception\Data\TypeException;
 use Qubus\Http\Cookies\Validation\Validation;
 use Qubus\Http\Encryption\Encryptor;
 
@@ -39,6 +40,9 @@ readonly class ResponseCookieEncryptor
         return count($cookieNames) < 1;
     }
 
+    /**
+     * @throws TypeException
+     */
     public function encrypt(ResponseInterface $response, $cookieNames): ResponseInterface
     {
         $cookieNames = self::resolveCookieNames($cookieNames);
@@ -64,7 +68,7 @@ readonly class ResponseCookieEncryptor
 
         $cookie = $setCookies->get($cookieName);
         $decryptedValue = $cookie->getValue();
-        $encryptedValue = $this->encryptor->encrypt($decryptedValue);
+        $encryptedValue = $this->encryptor->encrypt((string) $decryptedValue);
         $signedValue = $this->validation->sign($encryptedValue);
         $encodedValue = base64_encode($signedValue);
         $encryptedCookie = $cookie->withValue($encodedValue);

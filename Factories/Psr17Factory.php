@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Qubus\Http\Factories;
 
 use Laminas\Diactoros\Stream;
+use Laminas\Diactoros\StreamFactory;
 use Laminas\Diactoros\UploadedFile;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -30,22 +31,14 @@ use function sprintf;
 
 use const UPLOAD_ERR_OK;
 
-class Psr17Factory extends RequestFactory implements
-    UriFactoryInterface,
-    UploadedFileFactoryInterface,
-    StreamFactoryInterface,
-    ServerRequestFactoryInterface,
-    ResponseFactoryInterface
+// phpcs:ignore Generic.Files.LineLength.TooLong
+class Psr17Factory extends RequestFactory implements UriFactoryInterface, UploadedFileFactoryInterface, StreamFactoryInterface, ServerRequestFactoryInterface, ResponseFactoryInterface
 {
     public function createResponse(int $code = 200, string $reasonPhrase = ''): ResponseInterface
     {
-        if (2 > \func_num_args()) {
-            // This will make the Response class to use a custom reasonPhrase
-            $reasonPhrase = null;
-        }
-        return new Response(body: null, status: $code, headers:[])
-                ->withProtocolVersion(version: '1.1')
-                ->withStatus(code: $code, reasonPhrase: $reasonPhrase);
+        return new Response(status: $code)
+            ->withProtocolVersion(version: '1.1')
+            ->withStatus(code: $code, reasonPhrase: $reasonPhrase);
     }
 
     public function createServerRequest(string $method, $uri, array $serverParams = []): ServerRequestInterface
@@ -54,7 +47,7 @@ class Psr17Factory extends RequestFactory implements
             serverParams: $serverParams,
             uri: $uri,
             method: $method,
-            body: null,
+            body: 'php://temp',
             headers: [],
             protocol: '1.1'
         );
@@ -62,7 +55,7 @@ class Psr17Factory extends RequestFactory implements
 
     public function createStream(string $content = ''): StreamInterface
     {
-        return new Stream(stream: $content);
+        return new StreamFactory()->createStream(content: $content);
     }
 
     /**

@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace Qubus\Http\Cookies\Validation;
 
+use Random\RandomException;
 use RuntimeException;
+use InvalidArgumentException;
 
-use function chr;
 use function hash_equals;
 use function hash_hmac;
-use function mt_rand;
+use function hash_hmac_algos;
+use function in_array;
+use function random_bytes;
 
 class Validation
 {
@@ -32,9 +35,17 @@ class Validation
     {
         $this->key = $key;
         $this->algo = $algo ?: static::DEFAULT_ALGO;
+
+        if ($key === '') {
+            throw new InvalidArgumentException('The cookie signing key cannot be empty.');
+        }
+
+        if (! in_array($this->algo, hash_hmac_algos(), true)) {
+            throw new InvalidArgumentException('The requested HMAC algorithm is not supported.');
+        }
     }
 
-    public function extract($value): string
+    public function extract(string $value): string
     {
         $message = Message::fromString($value);
 
@@ -45,7 +56,10 @@ class Validation
         return $message->getValue();
     }
 
-    public function sign($value): string|false
+    /**
+     * @throws RandomException
+     */
+    public function sign(string $value): string
     {
         $nonce = $this->generateNonce();
 
@@ -65,16 +79,15 @@ class Validation
         return self::hashCompare($calculatedHmac, $message->getHmac());
     }
 
+    /**
+     * @throws RandomException
+     */
     private static function generateNonce(): string
     {
-        $result = '';
-        for ($i = 0; $i < static::NONCE_LENGTH; $i++) {
-            $result .= chr((mt_rand() ^ mt_rand()) % 256);
-        }
-        return $result;
+        return random_bytes(static::NONCE_LENGTH);
     }
 
-    private static function hashCompare($hash1, $hash2): bool
+    private static function hashCompare(string $hash1, string $hash2): bool
     {
         return hash_equals($hash1, $hash2);
     }

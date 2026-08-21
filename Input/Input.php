@@ -19,6 +19,7 @@ use IteratorAggregate;
 use Traversable;
 
 use function json_encode;
+use function is_array;
 use function str_replace;
 use function strtolower;
 use function ucfirst;
@@ -84,12 +85,16 @@ class Input implements Item, ArrayAccess, IteratorAggregate
 
     public function __toString(): string
     {
-        return json_encode($this->value);
+        if (is_array($this->value)) {
+            return (string) json_encode($this->value);
+        }
+
+        return (string) $this->value;
     }
 
     public function offsetExists(mixed $offset): bool
     {
-        return isset($this->value[$offset]);
+        return is_array($this->value) && isset($this->value[$offset]);
     }
 
     public function offsetGet(mixed $offset): mixed
@@ -103,16 +108,27 @@ class Input implements Item, ArrayAccess, IteratorAggregate
 
     public function offsetSet(mixed $offset, mixed $value): void
     {
+        if (! is_array($this->value)) {
+            $this->value = [];
+        }
+
+        if ($offset === null) {
+            $this->value[] = $value;
+            return;
+        }
+
         $this->value[$offset] = $value;
     }
 
     public function offsetUnset(mixed $offset): void
     {
-        unset($this->value[$offset]);
+        if (is_array($this->value)) {
+            unset($this->value[$offset]);
+        }
     }
 
     public function getIterator(): Traversable
     {
-        return new ArrayIterator($this->getValue());
+        return new ArrayIterator(is_array($this->value) ? $this->value : []);
     }
 }

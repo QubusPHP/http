@@ -44,8 +44,14 @@ class ServerRequest extends BaseServerRequest implements ServerRequestInterface
         );
     }
 
-    public function get(mixed $name): mixed
+    public function get(mixed $name, mixed $default = null): mixed
     {
-        return $this->getParsedBody()[$name];
+        $parsedBody = $this->getParsedBody();
+
+        if (! is_array($parsedBody)) {
+            return $default;
+        }
+
+        return $parsedBody[$name] ?? $default;
     }
 }

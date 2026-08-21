@@ -126,4 +126,11 @@ trait EmitterTraitAware
             fastcgi_finish_request();
         }
     }
+
+    protected function shouldEmitBody(ResponseInterface $response): bool
+    {
+        $status = $response->getStatusCode();
+
+        return $status >= 200 && $status !== 204 && $status !== 205 && $status !== 304;
+    }
 }

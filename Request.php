@@ -22,15 +22,18 @@ use Qubus\Http\Exception\MalformedUrlException;
 use Qubus\Http\Input\Handler;
 
 use function array_key_exists;
+use function array_map;
 use function explode;
 use function gethostbyname;
-use function is_array;
+use function in_array;
+use function is_numeric;
 use function is_string;
 use function preg_match_all;
 use function rtrim;
 use function str_replace;
 use function stripos;
 use function strpos;
+use function trim;
 use function strtolower;
 use function strtoupper;
 
@@ -92,7 +95,7 @@ final class Request extends BaseRequest implements RequestInterface
      * Request ContentType
      * @var string
      */
-    protected string $contentType;
+    protected string $contentType = '';
 
     /**
      * Request host.
@@ -138,38 +141,48 @@ final class Request extends BaseRequest implements RequestInterface
             $this->httpHeaders[strtolower(string: $key)] = $value;
             $this->httpHeaders[strtolower(string: str_replace(search: '_', replace: '-', subject: $key))] = $value;
         }
-        if (null !== $this->getHttpHeader(name: 'http-host')) {
-            $this->setHost($this->getHttpHeader(name: 'http-host'));
-        }
-        if (null !== $uri) {
+
+        if ($uri === null) {
             // Check if special IIS header exist, otherwise use default.
-            if (! empty($this->getHttpHeader(name: 'unencoded-url'))) {
-                $uri = $this->getScheme() . '://' . $this->getHost() . $this->getHttpHeader(name: 'unencoded-url');
-            }
-            if (empty($this->getHttpHeader(name: 'unencoded-url'))) {
-                $uri = $this->getScheme() . '://' . $this->getHost() . $this->getHttpHeader(name: 'request-uri');
-            }
+            $path = $this->getHttpHeader(name: 'unencoded-url')
+            ?? $this->getHttpHeader(name: 'request-uri')
+            ?? '/';
+            $host = $this->getHttpHeader(name: 'host');
+            $scheme = $this->isSecure() ? 'https' : 'http';
+            $uri = $host === null ? $path : $scheme . '://' . $host . $path;
         }
 
-        if (isset($this->httpHeaders['http-host'])) {
-            $this->setUrl(url: new Url(uri: $uri ?? ''));
+        $method ??= $this->getHttpHeader(name: 'request-method') ?? 'GET';
+        $actualMethod = strtoupper($method);
+        $overrideMethod = $_POST[self::FORCE_METHOD_KEY] ?? null;
+
+        if (
+            $actualMethod === 'POST'
+            && is_string($overrideMethod)
+            && $this->isValidHttpMethod($overrideMethod)
+        ) {
+            $method = $overrideMethod;
         }
-
-        $this->withContentType(contentType: (string)$this->getHttpHeader('content-type'));
-        $this->setMethod(
-            method: (string)($_POST[self::FORCE_METHOD_KEY] ?? $this->getHttpHeader('request-method'))
-        );
-
-        $this->inputHandler = new Handler(request: $this);
 
         parent::__construct($uri, $method, $body, $headers);
+
+        $this->setUrl(url: new Url(uri: (string) $this->getUri()));
+        $this->setHost($this->getUri()->getHost() ?: $this->getHttpHeader(name: 'host'));
+        $this->withContentType(
+            contentType: $this->getHeaderLine('Content-Type') ?: (string) $this->getHttpHeader('content-type')
+        );
+        $this->setMethod(method: $this->getMethod());
+        $this->inputHandler = new Handler(request: $this);
     }
 
-    public function isSecure(): bool
+    public function isSecure(bool $trustForwardedHeader = false): bool
     {
-        return $this->getHttpHeader(name: 'http-x-forwarded-proto') === 'https'
-        || $this->getHttpHeader(name: 'https') !== null
-        || (int)$this->getHttpHeader(name: 'server-port') === 443;
+        $https = strtolower((string) $this->getHttpHeader(name: 'https'));
+
+        return ($this->url?->isSecure() ?? false)
+        || ($trustForwardedHeader && strtolower((string) $this->getHttpHeader('x-forwarded-proto')) === 'https')
+        || ($https !== '' && $https !== 'off' && $https !== '0')
+        || (int) $this->getHttpHeader(name: 'server-port') === 443;
     }
 
     public function getUrl(): Url
@@ -274,11 +287,11 @@ final class Request extends BaseRequest implements RequestInterface
     /**
      * Get header value by name
      *
-     * @param string            $name Name of the header.
-     * @param string|mixed|null $defaultValue Value to be returned if header is not found.
-     * @param bool              $tryParse When enabled the method will try to find the header
-     *                                    from both client (http) and server-side variants,
-     *                                    if the header is not found.
+     * @param string      $name Name of the header.
+     * @param string|null $defaultValue Value to be returned if header is not found.
+     * @param bool        $tryParse     When enabled the method will try to find the header
+     *                                  from both client (http) and server-side variants,
+     *                                  if the header is not found.
      */
     public function getHttpHeader(string $name, ?string $defaultValue = null, bool $tryParse = true): ?string
     {
@@ -297,7 +310,11 @@ final class Request extends BaseRequest implements RequestInterface
             }
         }
 
-        return $header ?? $defaultValue;
+        if ($header === null) {
+            return $defaultValue;
+        }
+
+        return is_string($header) || is_numeric($header) ? (string) $header : $defaultValue;
     }
 
     /**
@@ -326,11 +343,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function getContentType(): ?string
     {
-        if (! $contentType = $this->getServer(name: 'content-type')) {
-            return null;
-        }
-
-        return $contentType;
+        return $this->contentType !== '' ? $this->contentType : null;
     }
 
     /**
@@ -340,10 +353,8 @@ final class Request extends BaseRequest implements RequestInterface
      */
     protected function withContentType(string $contentType): self
     {
-        $new = clone $this;
-
         if (strpos($contentType, ';') > 0) {
-            $new->contentType = strtolower(
+            $this->contentType = strtolower(
                 string: substr(
                     string: $contentType,
                     offset: 0,
@@ -351,10 +362,10 @@ final class Request extends BaseRequest implements RequestInterface
                 )
             );
         } else {
-            $new->contentType = strtolower(string: $contentType);
+            $this->contentType = strtolower(string: $contentType);
         }
 
-        return $new;
+        return $this;
     }
 
     /**
@@ -417,10 +428,8 @@ final class Request extends BaseRequest implements RequestInterface
                 return $auth;
             }
 
-            if (is_array(value: $matches)) {
-                foreach ($matches as $match) {
-                    $auth[$match[1]] = $match[3];
-                }
+            foreach ($matches as $match) {
+                $auth[$match[1]] = $match[3];
             }
         }
 
@@ -456,15 +465,15 @@ final class Request extends BaseRequest implements RequestInterface
             return false;
         }
 
-        if (strpos(haystack: $address, needle: ',')) {
+        if (str_contains($address, ',')) {
             /**
              * The client address has multiples parts, only return the first
              * part.
              */
-            return explode(separator: ',', string: $address)[0];
+            return trim(explode(separator: ',', string: $address)[0]);
         }
 
-        return $address;
+        return trim($address);
     }
 
     /**
@@ -500,7 +509,9 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function getScheme(): string
     {
-        return $this->isSecure() ? 'https' : 'http';
+        $scheme = $this->getUri()->getScheme();
+
+        return $scheme !== '' ? $scheme : ($this->isSecure() ? 'https' : 'http');
     }
 
     /**
@@ -508,23 +519,28 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function getServer(string $name): ?string
     {
-        if (!isset($this->httpHeaders[$name])) {
+        $name = strtolower(str_replace('_', '-', $name));
+
+        if (! array_key_exists($name, $this->httpHeaders)) {
             return null;
         }
 
-        if (! $serverValue = $this->httpHeaders[$name]) {
+        $serverValue = $this->httpHeaders[$name];
+        if (! is_string($serverValue) && ! is_numeric($serverValue)) {
             return null;
         }
 
-        return $serverValue;
+        return (string) $serverValue;
     }
 
     /**
      * Checks whether $_SERVER super global has certain index.
      */
-    final public function hasServer(string $name): string
+    final public function hasServer(string $name): bool
     {
-        return $this->httpHeaders[$name];
+        $name = strtolower(str_replace('_', '-', $name));
+
+        return array_key_exists($name, $this->httpHeaders);
     }
 
     /**
@@ -534,7 +550,7 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function isPostBack(): bool
     {
-        return in_array(needle: $this->getMethod(), haystack: self::$requestTypesPost, strict: true);
+        return in_array(needle: strtolower($this->getMethod()), haystack: self::$requestTypesPost, strict: true);
     }
 
     /**
@@ -544,16 +560,24 @@ final class Request extends BaseRequest implements RequestInterface
      */
     public function getAcceptFormats(): array
     {
-        return explode(separator: ',', string: $this->getHttpHeader(name: 'http-accept'));
+        $header = $this->getHttpHeader(name: 'http-accept');
+
+        if ($header === null || $header === '') {
+            return [];
+        }
+
+        return array_map(static fn (string $format): string => trim($format), explode(',', $header));
     }
 
     public function setUrl(Url $url): void
     {
         $this->url = $url;
 
-        if ($this->isSecure() === true) {
-            $this->url->withScheme(scheme: 'https');
+        if ($this->isSecure() === true && ! $url->isSecure()) {
+            $url = $url->withScheme(scheme: 'https');
         }
+
+        $this->url = $url;
     }
 
     public function setHost(?string $host): void
@@ -683,7 +707,7 @@ final class Request extends BaseRequest implements RequestInterface
 
     protected function getServerArray(): array
     {
-        return $_SERVER ?? [];
+        return $_SERVER;
     }
 
     public function __isset(string $name)

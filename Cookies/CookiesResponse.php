@@ -16,10 +16,11 @@ namespace Qubus\Http\Cookies;
 use Psr\Http\Message\ResponseInterface;
 use Qubus\Exception\Data\TypeException;
 
-use function is_callable;
-
 final class CookiesResponse
 {
+    /**
+     * @throws TypeException
+     */
     public static function get(ResponseInterface $response, string $name, ?string $value = null): SetCookieCollection
     {
         $setCookies = SetCookies::fromResponse($response);
@@ -36,6 +37,7 @@ final class CookiesResponse
      * @param ResponseInterface $response
      * @param SetCookieCollection $setCookieCollection
      * @return ResponseInterface
+     * @throws TypeException
      */
     public static function set(ResponseInterface $response, SetCookieCollection $setCookieCollection): ResponseInterface
     {
@@ -57,10 +59,6 @@ final class CookiesResponse
      */
     public static function modify(ResponseInterface $response, string $name, callable $modify): ResponseInterface
     {
-        if (! is_callable($modify)) {
-            throw new TypeException('$modify must be callable.');
-        }
-
         $setCookies = SetCookies::fromResponse($response);
         $setCookie  = $modify($setCookies->has($name)
             ? $setCookies->get($name)
@@ -71,6 +69,9 @@ final class CookiesResponse
             ->renderIntoSetCookieHeader($response);
     }
 
+    /**
+     * @throws TypeException
+     */
     public static function remove(ResponseInterface $response, string $name): ResponseInterface
     {
         return SetCookies::fromResponse($response)

@@ -1,7 +1,9 @@
+docs
 /vendor/
 .idea
 Tests/Session/files/@psr*
 .phpcs-cache
 .phpunit.result.cache
+.phpunit.cache/
 composer.lock
 index.php

@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace Qubus\Http\Cookies;
 
+use Qubus\Exception\Data\TypeException;
+
 use function array_map;
+use function preg_match;
 use function urlencode;
 
 final class CookieCollection
@@ -22,8 +25,15 @@ final class CookieCollection
 
     private ?string $value = null;
 
+    /**
+     * @throws TypeException
+     */
     public function __construct(string $name, ?string $value = null)
     {
+        if ($name === '' || preg_match('/[\x00-\x1f\x7f]/', $name)) {
+            throw new TypeException('Cookie names cannot be empty or contain control characters.');
+        }
+
         $this->name  = $name;
         $this->value = $value;
     }
@@ -67,8 +77,9 @@ final class CookieCollection
     /**
      * Create a cookie.
      *
-     * @param string      $name Cookie name.
+     * @param string $name Cookie name.
      * @param string|null $value Cookie value.
+     * @throws TypeException
      */
     public static function create(string $name, ?string $value = null): self
     {
@@ -79,6 +90,7 @@ final class CookieCollection
      * Create a list of Cookies from a Cookie header value string.
      *
      * @return self[]
+     * @throws TypeException
      */
     public static function listFromCookieString(string $string): array
     {
@@ -91,17 +103,13 @@ final class CookieCollection
 
     /**
      * Create one Cookie from a cookie key/value header value string.
+     *
+     * @throws TypeException
      */
     public static function oneFromCookiePair(string $string): self
     {
         [$cookieName, $cookieValue] = Util::splitCookiePair($string);
 
-        $cookie = new self($cookieName);
-
-        if ($cookieValue !== null) {
-            $cookie = $cookie->withValue($cookieValue);
-        }
-
-        return $cookie;
+        return new self($cookieName, $cookieValue);
     }
 }

@@ -19,7 +19,9 @@ use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 
+use function array_values;
 use function implode;
+use function is_array;
 
 trait CookieMessageTesting
 {
@@ -49,7 +51,7 @@ trait CookieMessageTesting
     {
         $clone = clone $this;
 
-        $clone->headers[$name] = [$value];
+        $clone->headers[$name] = is_array($value) ? array_values($value) : [$value];
 
         return $clone;
     }
@@ -105,7 +107,7 @@ trait CookieMessageTesting
             return [];
         }
 
-        return [$this->headers[$name]];
+        return $this->headers[$name];
     }
 
     /** {@inheritDoc} */

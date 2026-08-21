@@ -44,7 +44,7 @@ final class SapiStreamEmitter extends BaseEmitter
      */
     public function setMaxBufferSize(int $maxBufferSize): SapiStreamEmitter
     {
-        if (!$maxBufferSize < 1) {
+        if ($maxBufferSize < 1) {
             throw new EmitterException('Buffer size must be a positive integer');
         }
 
@@ -58,10 +58,14 @@ final class SapiStreamEmitter extends BaseEmitter
     public function emit(ResponseInterface $response): void
     {
         $this->assertNoPreviousOutput();
-        $this->emitHeaders($response);
         $this->emitStatusLine($response);
+        $this->emitHeaders($response);
         flush();
-        $this->emitStream($response);
+
+        if ($this->shouldEmitBody($response)) {
+            $this->emitStream($response);
+        }
+
         $this->closeConnection();
     }
 

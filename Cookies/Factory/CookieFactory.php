@@ -37,18 +37,19 @@ class CookieFactory implements HttpCookieFactory
 
         // Make sure we send both the MaxAge and Expires parameters (the former
         // is not supported by all browser versions)
-        if ($maxAge) {
+        if ($maxAge !== null) {
             $cookie = $cookie
                 ->withMaxAge(maxAge: $maxAge)
                 ->withExpires(expires: time() + $maxAge);
         }
 
-        if (! is_null__(var: $this->domain())) {
-            $cookie = $cookie->withDomain(domain: $this->domain());
+        $domain = $this->domain();
+        if (! is_null__(var: $domain) && $domain !== '') {
+            $cookie = $cookie->withDomain(domain: $domain);
         }
 
         // Explicitly set SameSite value, use sensible default if no value provided.
-        $cookie = $cookie->withSameSite(sameSite: SameSite::{$this->samesite()}());
+        $cookie = $cookie->withSameSite(sameSite: SameSite::fromString($this->samesite()));
 
         return $cookie
             ->withPath(path: $this->path())

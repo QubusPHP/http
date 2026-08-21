@@ -13,6 +13,7 @@ use Swoole\Http\Response;
 
 use function extension_loaded;
 use function Laminas\Diactoros\normalizeUploadedFiles;
+use function str_contains;
 
 use const PHP_SAPI;
 
@@ -59,15 +60,24 @@ final class RequestCallback
         /** @var array<string, string> | array<empty> $query_params */
         $query_params = $swooleRequest->get ?? [];
 
+        /** @var array<string, mixed> | array<empty> $parsedBody */
+        $parsedBody = $swooleRequest->post ?? [];
+
+        $uri = $server['request_uri'] ?? '/';
+        if (($server['query_string'] ?? '') !== '' && ! str_contains($uri, '?')) {
+            $uri .= '?' . $server['query_string'];
+        }
+
         return new ServerRequest(
             $server,
             normalizeUploadedFiles($files),
-            $server['request_uri'] ?? '/',
+            $uri,
             $server['request_method'] ?? 'GET',
             $this->options->getStreamFactory()->createStream((string) $swooleRequest->rawContent()),
             $headers,
             $cookies,
             $query_params,
+            $parsedBody,
         );
     }
 

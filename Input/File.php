@@ -14,11 +14,15 @@ declare(strict_types=1);
 namespace Qubus\Http\Input;
 
 use Qubus\Exception\Data\TypeException;
+use RuntimeException;
 
 use function array_merge;
 use function file_get_contents;
+use function is_numeric;
+use function is_string;
 use function move_uploaded_file;
 use function pathinfo;
+use function sprintf;
 use function str_replace;
 use function strtolower;
 use function ucfirst;
@@ -30,10 +34,10 @@ class File implements Item
     public string|int $index;
     public string $name;
     public ?string $filename = null;
-    public ?int $size = null;
-    public ?string $type = null;
+    public ?int $size = 0;
+    public ?string $type = 'application/octet-stream';
     public int $errors = 0;
-    public ?string $tmpName = null;
+    public ?string $tmpName = '';
 
     public function __construct(string|int $index)
     {
@@ -46,13 +50,26 @@ class File implements Item
     /**
      * Create from array
      *
+     * @param array $values
+     * @return self
      * @throws TypeException
-     * @return static
      */
     public static function createFromArray(array $values): self
     {
         if (isset($values['index']) === false) {
             throw new TypeException('Index key is required');
+        }
+
+        foreach (['name', 'tmp_name', 'type'] as $key) {
+            if (! isset($values[$key]) || ! is_string($values[$key])) {
+                throw new TypeException(sprintf('The upload %s key must be a string.', $key));
+            }
+        }
+
+        foreach (['size', 'error'] as $key) {
+            if (! isset($values[$key]) || ! is_numeric($values[$key])) {
+                throw new TypeException(sprintf('The upload %s key must be numeric.', $key));
+            }
         }
 
         /* Easy way of ensuring that all indexes-are set and not filling the screen with isset() */
@@ -66,7 +83,7 @@ class File implements Item
 
         $values = array_merge($extended, $values);
 
-        return new static($values['index'])
+        return new self($values['index'])
             ->setSize((int) $values['size'])
             ->setError((int) $values['error'])
             ->setType($values['type'])
@@ -92,7 +109,7 @@ class File implements Item
 
     public function getSize(): int
     {
-        return $this->size;
+        return $this->size ?? 0;
     }
 
     /**
@@ -116,7 +133,7 @@ class File implements Item
 
     public function getType(): string
     {
-        return $this->type;
+        return $this->type ?? 'application/octet-stream';
     }
 
     /**
@@ -188,6 +205,10 @@ class File implements Item
      */
     public function move(string $destination): bool
     {
+        if ($this->hasError() || $this->tmpName === null || $this->tmpName === '') {
+            return false;
+        }
+
         return move_uploaded_file($this->tmpName, $destination);
     }
 
@@ -196,7 +217,17 @@ class File implements Item
      */
     public function getContents(): string
     {
-        return file_get_contents($this->tmpName);
+        if ($this->tmpName === null || $this->tmpName === '') {
+            throw new RuntimeException('The uploaded temporary file path is empty.');
+        }
+
+        $contents = file_get_contents($this->tmpName);
+
+        if ($contents === false) {
+            throw new RuntimeException('Unable to read the uploaded temporary file.');
+        }
+
+        return $contents;
     }
 
     /**
@@ -222,13 +253,13 @@ class File implements Item
      */
     public function setError(?int $error = null): Item
     {
-        $this->errors = $error;
+        $this->errors = $error ?? 0;
         return $this;
     }
 
     public function getTmpName(): string
     {
-        return $this->tmpName;
+        return $this->tmpName ?? '';
     }
 
     /**

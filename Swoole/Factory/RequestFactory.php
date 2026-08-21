@@ -12,12 +12,12 @@ use Qubus\Http\Swoole\Request;
 use Qubus\Http\Swoole\ServerRequest;
 use Swoole\Http\Request as SwooleRequest;
 
-class RequestFactory implements PsrSwooleFactory
+readonly class RequestFactory implements PsrSwooleFactory
 {
     public function __construct(
-        private readonly UriFactoryInterface $uriFactory,
-        private readonly StreamFactoryInterface $streamFactory,
-        private readonly UploadedFileFactoryInterface $uploadedFileFactory
+        private UriFactoryInterface $uriFactory,
+        private StreamFactoryInterface $streamFactory,
+        private UploadedFileFactoryInterface $uploadedFileFactory
     ) {
     }
 

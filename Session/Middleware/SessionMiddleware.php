@@ -26,6 +26,7 @@ use Qubus\Http\Session\SessionService;
 final class SessionMiddleware implements MiddlewareInterface
 {
     public const string SESSION_ATTRIBUTE = 'qubus.session';
+    public const string SESSION_OBJECT_ATTRIBUTE = 'qubus.session.object';
 
     public function __construct(public readonly SessionService $sessionService)
     {
@@ -45,7 +46,7 @@ final class SessionMiddleware implements MiddlewareInterface
 
         $request = $request
             ->withAttribute(self::SESSION_ATTRIBUTE, $session->clientSessionId())
-            ->withHeader('X-Session-Id', $session->clientSessionId());
+            ->withAttribute(self::SESSION_OBJECT_ATTRIBUTE, $session);
 
         $response = $handler->handle($request);
 

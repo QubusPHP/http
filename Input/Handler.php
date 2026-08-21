@@ -24,6 +24,7 @@ use function file_get_contents;
 use function in_array;
 use function is_array;
 use function json_decode;
+use function json_last_error;
 use function parse_str;
 use function str_starts_with;
 use function trim;
@@ -76,8 +77,14 @@ class Handler
     public function parseInputs(): void
     {
         /* Parse get requests */
-        if (count($_GET) !== 0) {
-            $this->originalParams = $_GET;
+        $this->originalParams = $_GET;
+        if ($this->originalParams === [] && $this->request->getUri()->getQuery() !== '') {
+            $queryParams = [];
+            parse_str($this->request->getUri()->getQuery(), $queryParams);
+            $this->originalParams = $queryParams;
+        }
+
+        if (count($this->originalParams) !== 0) {
             $this->get = $this->parseInputItem($this->originalParams);
         }
 
@@ -85,17 +92,36 @@ class Handler
         $this->originalPost = $_POST;
 
         if ($this->request->isPostBack() === true) {
+            $body = $this->request->getBody();
+            $position = $body->isSeekable() ? $body->tell() : null;
 
-            $contents = file_get_contents(filename: 'php://input');
+            if ($body->isSeekable()) {
+                $body->rewind();
+            }
+
+            $contents = $body->getContents();
+
+            if ($position !== null) {
+                $body->seek($position);
+            }
+
+            if ($contents === '') {
+                $contents = (string) file_get_contents(filename: 'php://input');
+            }
 
             // Append any PHP-input json
-            if (str_starts_with(trim(string: $contents), '{')) {
+            $trimmedContents = trim(string: $contents);
+            if (
+                $this->request->getContentType() === Request::CONTENT_TYPE_JSON
+                || str_starts_with($trimmedContents, '{')
+                || str_starts_with($trimmedContents, '[')
+            ) {
                 $post = json_decode($contents, true);
 
-                if ($post !== false) {
+                if (is_array($post) && json_last_error() === JSON_ERROR_NONE) {
                     $this->originalPost += $post;
                 }
-            } else {
+            } elseif ($contents !== '') {
                 $post = [];
                 parse_str($contents, $post);
                 $this->originalPost += $post;
@@ -238,7 +264,7 @@ class Handler
      * Find input object.
      *
      * @param string $index
-     * @param array ...$methods
+     * @param string|array ...$methods
      * @return string|Input|array|File|null
      */
     public function find(string $index, ...$methods): string|Input|array|File|null
@@ -246,7 +272,9 @@ class Handler
         $element = null;
 
         if (count($methods) > 0) {
-            $methods = is_array(...$methods) ? array_values(...$methods) : $methods;
+            $methods = count($methods) === 1 && is_array($methods[0])
+            ? array_values($methods[0])
+            : $methods;
         }
 
         if (count($methods) === 0 || in_array(Request::REQUEST_TYPE_GET, $methods, true) === true) {
@@ -294,9 +322,9 @@ class Handler
      * @param string $index
      * @param string|null|mixed $defaultValue
      * @param array ...$methods
-     * @return array|string|null
+     * @return mixed
      */
-    public function value(string $index, mixed $defaultValue = null, ...$methods): array|string|null
+    public function value(string $index, mixed $defaultValue = null, ...$methods): mixed
     {
         $input = $this->find($index, ...$methods);
 
@@ -311,7 +339,7 @@ class Handler
             return (count($output) === 0) ? $defaultValue : $output;
         }
 
-        return ($input === null || (is_string($input) && trim($input) === '')) ? $defaultValue : $input;
+        return ($input === null || trim($input) === '') ? $defaultValue : $input;
     }
 
     /**

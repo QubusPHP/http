@@ -25,7 +25,9 @@ use function implode;
 use function is_int;
 use function is_numeric;
 use function is_string;
+use function preg_match;
 use function sprintf;
+use function str_starts_with;
 use function strtolower;
 use function strtotime;
 use function urlencode;
@@ -36,14 +38,20 @@ final class SetCookieCollection
     private ?string $value = null;
     private int $expires = 0;
     private int $maxAge = 0;
+    private bool $hasMaxAge = false;
     private ?string $path = null;
     private ?string $domain = null;
     private bool $secure = false;
     private bool $httpOnly = false;
     private ?SameSite $sameSite = null;
+    private bool $partitioned = false;
 
+    /**
+     * @throws TypeException
+     */
     private function __construct(string $name, ?string $value = null)
     {
+        self::assertValidName($name);
         $this->name  = $name;
         $this->value = $value;
     }
@@ -118,6 +126,11 @@ final class SetCookieCollection
     public function getSameSite(): ?SameSite
     {
         return $this->sameSite;
+    }
+
+    public function getPartitioned(): bool
+    {
+        return $this->partitioned;
     }
 
     /**
@@ -207,15 +220,19 @@ final class SetCookieCollection
         $clone = clone $this;
 
         $clone->maxAge = (int) $maxAge;
+        $clone->hasMaxAge = $maxAge !== null;
 
         return $clone;
     }
 
     /**
      * Return an instance with the provided path.
+     *
+     * @throws TypeException
      */
     public function withPath(?string $path = null): self
     {
+        self::assertValidAttributeValue($path, 'path');
         $clone = clone $this;
 
         $clone->path = $path;
@@ -225,9 +242,12 @@ final class SetCookieCollection
 
     /**
      * Return an instance with the provided domain.
+     *
+     * @throws TypeException
      */
     public function withDomain(?string $domain = null): self
     {
+        self::assertValidAttributeValue($domain, 'domain');
         $clone = clone $this;
 
         $clone->domain = $domain;
@@ -274,8 +294,21 @@ final class SetCookieCollection
         return $clone;
     }
 
+    public function withPartitioned(bool $partitioned = true): self
+    {
+        $clone = clone $this;
+        $clone->partitioned = $partitioned;
+
+        return $clone;
+    }
+
+    /**
+     * @throws TypeException
+     */
     public function __toString(): string
     {
+        $this->assertValidSecurityAttributes();
+
         $cookieStringParts = [
             urlencode($this->name) . '=' . urlencode((string) $this->value),
         ];
@@ -288,9 +321,16 @@ final class SetCookieCollection
         $cookieStringParts = $this->appendFormattedHttpOnlyPartIfSet($cookieStringParts);
         $cookieStringParts = $this->appendFormattedSameSitePartIfSet($cookieStringParts);
 
+        if ($this->partitioned) {
+            $cookieStringParts[] = 'Partitioned';
+        }
+
         return implode('; ', $cookieStringParts);
     }
 
+    /**
+     * @throws TypeException
+     */
     public static function create(string $name, ?string $value = null): self
     {
         return new self($name, $value);
@@ -332,11 +372,7 @@ final class SetCookieCollection
 
         [$cookieName, $cookieValue] = Util::splitCookiePair($rawAttribute);
 
-        $setCookie = new self($cookieName);
-
-        if ($cookieValue !== null) {
-            $setCookie = $setCookie->withValue($cookieValue);
-        }
+        $setCookie = new self($cookieName, $cookieValue);
 
         while ($rawAttribute = array_shift($rawAttributes)) {
             $rawAttributePair = explode('=', $rawAttribute, 2);
@@ -367,6 +403,9 @@ final class SetCookieCollection
                     break;
                 case 'samesite':
                     $setCookie = $setCookie->withSameSite(SameSite::fromString((string) $attributeValue));
+                    break;
+                case 'partitioned':
+                    $setCookie = $setCookie->withPartitioned();
                     break;
             }
         }
@@ -419,7 +458,7 @@ final class SetCookieCollection
      */
     private function appendFormattedMaxAgePartIfSet(array $cookieStringParts): array
     {
-        if ($this->maxAge) {
+        if ($this->hasMaxAge) {
             $cookieStringParts[] = sprintf('Max-Age=%s', $this->maxAge);
         }
 
@@ -465,5 +504,52 @@ final class SetCookieCollection
         $cookieStringParts[] = $this->sameSite->asString();
 
         return $cookieStringParts;
+    }
+
+    /**
+     * @throws TypeException
+     */
+    private static function assertValidName(string $name): void
+    {
+        if ($name === '' || preg_match('/[\x00-\x1f\x7f]/', $name)) {
+            throw new TypeException('Cookie names cannot be empty or contain control characters.');
+        }
+    }
+
+    /**
+     * @throws TypeException
+     */
+    private static function assertValidAttributeValue(?string $value, string $attribute): void
+    {
+        if ($value !== null && preg_match('/[\x00-\x1f\x7f;]/', $value)) {
+            throw new TypeException(sprintf('Cookie %s contains invalid characters.', $attribute));
+        }
+    }
+
+    /**
+     * @throws TypeException
+     */
+    private function assertValidSecurityAttributes(): void
+    {
+        if ($this->sameSite?->asString() === 'SameSite=None' && ! $this->secure) {
+            throw new TypeException('Cookies using SameSite=None must also use Secure.');
+        }
+
+        if ($this->partitioned && ! $this->secure) {
+            throw new TypeException('Partitioned cookies must also use Secure.');
+        }
+
+        if (str_starts_with($this->name, '__Secure-') && ! $this->secure) {
+            throw new TypeException('Cookies using the __Secure- prefix must use Secure.');
+        }
+
+        if (
+            str_starts_with($this->name, '__Host-')
+            && (! $this->secure || $this->path !== '/' || $this->domain !== null)
+        ) {
+            throw new TypeException(
+                'Cookies using the __Host- prefix must use Secure, Path=/, and must not specify Domain.'
+            );
+        }
     }
 }

@@ -49,7 +49,7 @@ class ResponseMerger
         $psrResponse = $psrResponse->withoutHeader('Set-Cookie');
 
         foreach ($psrResponse->getHeaders() as $key => $headerArray) {
-            $swooleResponse->header($key, implode('; ', $headerArray));
+            $swooleResponse->header($key, implode(', ', $headerArray));
         }
     }
 
@@ -128,8 +128,8 @@ class ResponseMerger
 
     private function isFileStreamInBody(ResponseInterface $psrResponse): bool
     {
-        $streamType = explode('/', (string) $psrResponse->getBody()->getMetadata('stream_type'))[0] ?? '';
-        $wrapperType = explode('/', (string) $psrResponse->getBody()->getMetadata('wrapper_type'))[0] ?? '';
+        $streamType = explode('/', (string) $psrResponse->getBody()->getMetadata('stream_type'))[0];
+        $wrapperType = explode('/', (string) $psrResponse->getBody()->getMetadata('wrapper_type'))[0];
 
         return
         $streamType === static::FILES_STREAM_TYPE &&

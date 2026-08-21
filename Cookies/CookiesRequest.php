@@ -16,9 +16,6 @@ namespace Qubus\Http\Cookies;
 use Psr\Http\Message\RequestInterface;
 use Qubus\Exception\Data\TypeException;
 
-use function is_callable;
-use function sprintf;
-
 final class CookiesRequest
 {
     public static function get(RequestInterface $request, string $name, ?string $value = null): CookieCollection
@@ -45,12 +42,6 @@ final class CookiesRequest
      */
     public static function modify(RequestInterface $request, string $name, callable $modify): RequestInterface
     {
-        if (! is_callable($modify)) {
-            throw new TypeException(
-                sprintf("'%s' must be callable.", $modify)
-            );
-        }
-
         $cookies = Cookies::fromRequest($request);
         $cookie  = $modify($cookies->has($name)
             ? $cookies->get($name)

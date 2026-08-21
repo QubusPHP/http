@@ -26,7 +26,9 @@ class ContentRange
         private string $unit = 'bytes'
     ) {
         $this->setStart($start)
-            ->setEnd($end);
+            ->setEnd($end)
+            ->setSize($size)
+            ->setUnit($unit);
     }
 
     /**
@@ -48,6 +50,10 @@ class ContentRange
      */
     public function setUnit(string $unit): ContentRange
     {
+        if ($unit === '') {
+            throw new EmitterException('Range unit cannot be empty');
+        }
+
         $this->unit = $unit;
         return $this;
     }
@@ -107,6 +113,10 @@ class ContentRange
             );
         }
 
+        if ($end < $this->start) {
+            throw new EmitterException('Range end must be greater than or equal to range start');
+        }
+
         $this->end = $end;
         return $this;
     }
@@ -127,8 +137,16 @@ class ContentRange
      * @param  int|null $size The total size of the document.
      * @return  self
      */
-    public function setSize(?int $size): self
+    public function setSize(?int $size = null): self
     {
+        if ($size !== null && $size < 1) {
+            throw new EmitterException('Range size must be a positive integer');
+        }
+
+        if ($size !== null && $this->end >= $size) {
+            throw new EmitterException('Range end must be smaller than range size');
+        }
+
         $this->size = $size;
         return $this;
     }

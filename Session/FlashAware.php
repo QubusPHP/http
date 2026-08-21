@@ -112,10 +112,12 @@ trait FlashAware
         }
 
         // Add the message to the session data
-        if (! array_key_exists($type, $this->session->get('flash'))) {
-            $_SESSION['flash'][$type] = [];
+        $flash = $this->session->get('flash');
+        if (! array_key_exists($type, $flash)) {
+            $flash[$type] = [];
         }
-        $_SESSION['flash'][$type][] = ['sticky' => $sticky, 'message' => $message];
+        $flash[$type][] = ['sticky' => $sticky, 'message' => $message];
+        $this->setSessionValue('flash', $flash);
 
         // Handle the redirect if needed
         if (null !== $redirectUrl) {

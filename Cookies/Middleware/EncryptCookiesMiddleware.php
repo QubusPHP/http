@@ -21,7 +21,6 @@ use Qubus\Http\Cookies\SetCookieCollection;
 use Qubus\Http\Cookies\SetCookies;
 use RuntimeException;
 
-use function error_log;
 use function in_array;
 
 class EncryptCookiesMiddleware implements MiddlewareInterface
@@ -60,7 +59,7 @@ class EncryptCookiesMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         foreach (Cookies::fromRequest($request)->getAll() as $cookie) {
-            if (!in_array($cookie->getName(), $this->bypass)) {
+            if (! in_array($cookie->getName(), $this->bypass, true)) {
                 $request = CookiesRequest::modify(
                     $request,
                     $cookie->getName(),
@@ -78,7 +77,7 @@ class EncryptCookiesMiddleware implements MiddlewareInterface
         $response = $handler->handle($request);
 
         foreach (SetCookies::fromResponse($response)->getAll() as $setCookie) {
-            if (!in_array($setCookie->getName(), $this->bypass)) {
+            if (! in_array($setCookie->getName(), $this->bypass, true)) {
                 $response = CookiesResponse::modify(
                     $response,
                     $setCookie->getName(),
@@ -95,7 +94,7 @@ class EncryptCookiesMiddleware implements MiddlewareInterface
      */
     public function encrypt(SetCookieCollection $setCookie): SetCookieCollection
     {
-        return $setCookie->withValue(Crypto::encrypt($setCookie->getValue(), $this->key));
+        return $setCookie->withValue(Crypto::encrypt((string) $setCookie->getValue(), $this->key));
     }
 
     public function decrypt(CookieCollection $cookie): CookieCollection
@@ -106,8 +105,7 @@ class EncryptCookiesMiddleware implements MiddlewareInterface
 
         try {
             return $cookie->withValue(Crypto::decrypt($cookie->getValue(), $this->key));
-        } catch (Exception $e) {
-            error_log($e->getMessage());
+        } catch (Exception) {
             return $cookie->withValue('');
         }
     }

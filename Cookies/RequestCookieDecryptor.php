@@ -64,7 +64,11 @@ readonly class RequestCookieDecryptor
 
         $cookie = $cookies->get($cookieName);
         $encodedValue = $cookie->getValue();
-        $signedValue = base64_decode($encodedValue);
+        $signedValue = base64_decode((string) $encodedValue, true);
+
+        if ($signedValue === false) {
+            throw new \RuntimeException('The encrypted cookie is not valid base64.');
+        }
         $encryptedValue = $this->validation->extract($signedValue);
         $decryptedValue = $this->decryptor->decrypt($encryptedValue);
         $decryptedCookie = $cookie->withValue($decryptedValue);

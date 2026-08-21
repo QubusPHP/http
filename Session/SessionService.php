@@ -20,6 +20,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Qubus\Exception\Data\TypeException;
 use Qubus\Http\Cookies\CookiesResponse;
 use Qubus\Http\Cookies\Factory\HttpCookieFactory;
+use Qubus\Http\Cookies\Factory\CookieFactory;
 use Qubus\Http\Session\Storage\SessionStorage;
 
 class SessionService
@@ -45,7 +46,7 @@ class SessionService
 
         $cookieName = self::$options['cookie-name'] ?? self::COOKIE_NAME;
 
-        if (isset($cookieName) && isset($cookies[$cookieName])) {
+        if (isset($cookies[$cookieName]) && is_string($cookies[$cookieName])) {
             $clientSessionId = $cookies[$cookieName];
 
             $pattern = '/' . Validatable::VALID_PATTERN . '/';
@@ -74,15 +75,17 @@ class SessionService
     public function commitSession(ResponseInterface $response, HttpSession $session): ResponseInterface
     {
         $data = $session->getData();
+        $isRenewed = method_exists($session, 'isRenewed') && $session->isRenewed();
+        $isNew = ! method_exists($session, 'isNew') || $session->isNew();
 
-        if ($session->isRenewed()) {
+        if ($isRenewed && method_exists($session, 'oldSessionId')) {
             // The session was renewed - destroy the data that was stored under the old Session ID:
             $this->sessionStorage->destroy(sessionId: $session->oldSessionId());
         }
 
         if (count($data) === 0) {
             // The session is empty - it should not be stored.
-            if (! $session->isNew()) {
+            if (! $isNew) {
                 // This session contained data previously and became empty - it should be destroyed:
                 $this->sessionStorage->destroy(sessionId: $session->sessionId());
                 // The cookie should be expired immediately:
@@ -99,7 +102,7 @@ class SessionService
             // The session contains data - it should be stored:
             $this->sessionStorage->write($session->sessionId(), $data, $this->getSessionLifetimeInSeconds());
 
-            if ($session->isNew() || $session->isRenewed()) {
+            if ($isNew || $isRenewed) {
                 // We've stored a new (or renewed) session - issue a cookie with the new Session ID:
                 $response = CookiesResponse::set(
                     response: $response,
@@ -120,9 +123,14 @@ class SessionService
      */
     private function getSessionLifetimeInSeconds(): int
     {
-        return self::$options['cookie-lifetime'] ?? $this->cookie->config()->getConfigKey(
-            key: 'cookies.lifetime',
-            default: 3600
-        );
+        if (isset(self::$options['cookie-lifetime'])) {
+            return (int) self::$options['cookie-lifetime'];
+        }
+
+        if ($this->cookie instanceof CookieFactory) {
+            return $this->cookie->config()->getConfigKey(key: 'cookies.lifetime', default: 3600);
+        }
+
+        return 3600;
     }
 }

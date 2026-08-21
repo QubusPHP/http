@@ -21,7 +21,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 use function array_shift;
 
-final class RequestHandler implements RequestHandlerInterface
+final readonly class RequestHandler implements RequestHandlerInterface
 {
     public const int RESPONSE_CODE = 200;
 
@@ -35,13 +35,13 @@ final class RequestHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $middleware = $this->middlewares[0] ?? false;
-        array_shift($this->middlewares);
+        $middlewares = $this->middlewares;
+        $middleware = array_shift($middlewares);
 
         return $middleware ?
         $middleware->process(
             $request,
-            new self($this->responseFactory, $this->middlewares)
+            new self($this->responseFactory, $middlewares)
         ) : $this->responseFactory->createResponse(self::RESPONSE_CODE);
     }
 }

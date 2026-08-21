@@ -14,9 +14,13 @@ class SapiEmitter extends BaseEmitter
     public function emit(ResponseInterface $response): void
     {
         $this->assertNoPreviousOutput();
-        $this->emitHeaders($response);
         $this->emitStatusLine($response);
-        $this->emitBody($response);
+        $this->emitHeaders($response);
+
+        if ($this->shouldEmitBody($response)) {
+            $this->emitBody($response);
+        }
+
         $this->closeConnection();
     }
 
